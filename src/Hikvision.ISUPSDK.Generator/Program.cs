@@ -144,29 +144,8 @@ using static Hikvision.ISUPSDK.Defines;
 
 namespace Hikvision.ISUPSDK
 {
-    public class Methods
+    public partial class Methods
     {
-        private static bool IsWindows = Environment.OSVersion.Platform == PlatformID.Win32NT;
-
-        public static int Invoke(int result)
-        {
-            if (result < 0)
-            {
-                int lastErrorCode = NET_ECMS_GetLastError();
-                throw new HikvisionException(lastErrorCode);
-            }
-            return result;
-        }
-
-        public static bool Invoke(bool result)
-        {
-            if (!result)
-            {
-                int lastErrorCode = NET_ECMS_GetLastError();
-                throw new HikvisionException(lastErrorCode);
-            }
-            return result;
-        }
 ");
 
     foreach (var method in methodList)

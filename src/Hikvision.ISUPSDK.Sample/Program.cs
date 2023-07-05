@@ -9,12 +9,13 @@ short listenPort = 7660;
 
 try
 {
+    SetWorkingDirToNativeDir();
+
     Invoke(NET_ECMS_Init());
     Console.WriteLine("初始化成功！");
 
     DEVICE_REGISTER_CB device_register_cb = (iUserID, dwDataType, pOutBuffer, dwOutLen, pInBuffer, dwInLen, pUser) =>
     {
-        Console.WriteLine("设备注册！");
         int dwSize = 0;
         LOCAL_DEVICE_INFO struTemp = new LOCAL_DEVICE_INFO();
         struTemp.Init();
@@ -37,11 +38,13 @@ try
         {
             Console.WriteLine("pOutBuffer is NULL");
         }
-        Console.WriteLine("struDevInfo: " + JsonConvert.SerializeObject(struDevInfo, Formatting.Indented));
-
+        
         //如果是设备上线回调
         if (ENUM_DEV_ON == dwDataType)
         {
+            Console.WriteLine("设备上线！");
+            Console.WriteLine("struDevInfo: " + JsonConvert.SerializeObject(struDevInfo, Formatting.Indented));
+
             if (pInBuffer == IntPtr.Zero)
             {
                 return false;
@@ -70,9 +73,7 @@ try
             else
             {
                 struTemp.dwVersion = 5;
-            }
-            Console.WriteLine("struTemp: " + JsonConvert.SerializeObject(struTemp, Formatting.Indented));
-
+            }           
             //返回服务端信息
             NET_EHOME_SERVER_INFO_V50 struServInfo = new NET_EHOME_SERVER_INFO_V50();
             struServInfo.Init();
@@ -92,7 +93,7 @@ try
         //如果是设备下线回调
         else if (ENUM_DEV_OFF == dwDataType)
         {
-
+            Console.WriteLine("设备下线！");
             Marshal.StructureToPtr(iUserID, ptrTemp, false);
 
             //Message mes = new Message();
@@ -181,6 +182,8 @@ try
     Console.WriteLine($"正在监听：{listenIPAddress}:{listenPort}...");
     var listenHandle = Invoke(NET_ECMS_StartListen(ref cmd_listen_param));
     Console.WriteLine("开始监听！");
+    RestoreWorkingDir();
+
     Console.ReadLine();
     NET_ECMS_StopListen(listenHandle);
     Console.WriteLine("已停止监听");

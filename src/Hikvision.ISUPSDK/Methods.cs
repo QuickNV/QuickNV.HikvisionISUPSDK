@@ -7,52 +7,14 @@ using static Hikvision.ISUPSDK.Defines;
 
 namespace Hikvision.ISUPSDK
 {
-    public class Methods
+    public partial class Methods
     {
-        private static bool IsWindows = Environment.OSVersion.Platform == PlatformID.Win32NT;
-
-        public static int Invoke(int result)
-        {
-            if (result < 0)
-            {
-                int lastErrorCode = NET_ECMS_GetLastError();
-                throw new HikvisionException(lastErrorCode);
-            }
-            return result;
-        }
-
-        public static bool Invoke(bool result)
-        {
-            if (!result)
-            {
-                int lastErrorCode = NET_ECMS_GetLastError();
-                throw new HikvisionException(lastErrorCode);
-            }
-            return result;
-        }
-
         public static bool NET_ECMS_Init()
         {
             if (IsWindows)
                 return Methods_Win.NET_ECMS_Init();
-            var nativeDir = string.Empty;
-            switch (RuntimeInformation.OSArchitecture)
-            {
-                case Architecture.X64:
-                    nativeDir = "runtimes/linux-x64/native";
-                    break;
-                case Architecture.X86:
-                    nativeDir = "runtimes/linux-x86/native";
-                    break;
-            }
-            if (string.IsNullOrEmpty(nativeDir))
+            else
                 return Methods_Linux.NET_ECMS_Init();
-
-            var preWorkDir = Environment.CurrentDirectory;
-            Environment.CurrentDirectory = Path.GetFullPath(nativeDir);
-            var ret = Methods_Linux.NET_ECMS_Init();
-            Environment.CurrentDirectory = preWorkDir;
-            return ret;
         }
 
         public static bool NET_ECMS_Fini()
