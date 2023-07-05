@@ -11,12 +11,12 @@ var context = new CmsContext(options);
 context.DeviceOnline += Context_DeviceOnline;
 context.DeviceOffline += Context_DeviceOffline;
 
-void Context_DeviceOffline(object? sender, DeviceInfo e)
+void Context_DeviceOffline(object? sender, DeviceContext e)
 {
     Console.WriteLine("设备下线！" + JsonConvert.SerializeObject(e, Formatting.Indented));
 }
 
-void Context_DeviceOnline(object? sender, DeviceInfo e)
+void Context_DeviceOnline(object? sender, DeviceContext e)
 {
     Console.WriteLine("设备上线！" + JsonConvert.SerializeObject(e, Formatting.Indented));
 }

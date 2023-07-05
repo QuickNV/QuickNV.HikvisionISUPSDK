@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Xml;
+using System.Threading.Tasks;
 using static Hikvision.ISUPSDK.Defines;
 using static Hikvision.ISUPSDK.Methods;
 
@@ -12,7 +12,7 @@ namespace Hikvision.ISUPSDK.Api
     {
         private CmsContextOptions options;
         private int listenHandle;
-        private Dictionary<int, DeviceInfo> deviceDict = new Dictionary<int, DeviceInfo>();
+        private Dictionary<int, DeviceContext> deviceDict = new Dictionary<int, DeviceContext>();
         public CmsContext(CmsContextOptions options)
         {
             this.options = options;
@@ -28,6 +28,22 @@ namespace Hikvision.ISUPSDK.Api
         {
             lock (deviceDict)
                 deviceDict.Clear();
+            //设置访问安全
+            var m_struAccessSecure = new NET_EHOME_LOCAL_ACCESS_SECURITY();
+            m_struAccessSecure.dwSize = (uint)Marshal.SizeOf(m_struAccessSecure);
+            m_struAccessSecure.byAccessSecurity = (byte)options.AccessSecurity;
+            IntPtr ptrAccessSecure = Marshal.AllocHGlobal((int)m_struAccessSecure.dwSize);
+            try
+            {
+                Marshal.StructureToPtr(m_struAccessSecure, ptrAccessSecure, false);
+                Invoke(NET_ECMS_SetSDKLocalCfg(NET_EHOME_LOCAL_CFG_TYPE.ACTIVE_ACCESS_SECURITY, ptrAccessSecure));
+            }
+            catch
+            {
+                Marshal.FreeHGlobal(ptrAccessSecure);
+                throw;
+            }
+            //开始监听
             var cmd_listen_param = new NET_EHOME_CMS_LISTEN_PARAM();
             cmd_listen_param.struAddress.Init();
             options.ListenIPAddress.CopyTo(0, cmd_listen_param.struAddress.szIP, 0, options.ListenIPAddress.Length);
@@ -42,13 +58,8 @@ namespace Hikvision.ISUPSDK.Api
             NET_ECMS_StopListen(listenHandle);
         }
 
-        public event EventHandler<DeviceInfo> DeviceOnline;
-        public event EventHandler<DeviceInfo> DeviceOffline;
-
-        private string ByteArray2String(byte[] buffer)
-        {
-            return Encoding.Default.GetString(buffer).Trim(char.MinValue);
-        }
+        public event EventHandler<DeviceContext> DeviceOnline;
+        public event EventHandler<DeviceContext> DeviceOffline;
 
         private bool onDEVICE_REGISTER_CB(int iUserID, int dwDataType, IntPtr pOutBuffer, uint dwOutLen,
                                                  IntPtr pInBuffer, uint dwInLen, IntPtr pUser)
@@ -62,27 +73,18 @@ namespace Hikvision.ISUPSDK.Api
                     struDevInfo = (NET_EHOME_DEV_REG_INFO_V12)Marshal.PtrToStructure(pOutBuffer, typeof(NET_EHOME_DEV_REG_INFO_V12));
                 }
             }
-            else
-            {
-                Console.WriteLine("pOutBuffer is NULL");
-            }
-
             //如果是设备上线回调
             if (ENUM_DEV_ON == dwDataType)
             {
-                var deviceInfo = new DeviceInfo();
-                deviceInfo.LoginID = iUserID;
-                deviceInfo.Id = ByteArray2String(struDevInfo.struRegInfo.byDeviceID);
-                deviceInfo.SessionKey = ByteArray2String(struDevInfo.struRegInfo.bySessionKey);
-                deviceInfo.Serial = ByteArray2String(struDevInfo.struRegInfo.sDeviceSerial);
-                deviceInfo.FirmwareVersion = ByteArray2String(struDevInfo.struRegInfo.byFirmwareVersion);
-                deviceInfo.IPAddress = new string(struDevInfo.struRegInfo.struDevAdd.szIP).Trim(char.MinValue);
-                deviceInfo.Port = struDevInfo.struRegInfo.struDevAdd.wPort;
-                deviceInfo.Type = struDevInfo.struRegInfo.dwDevType;
-                deviceInfo.ProtocolVersion = ByteArray2String(struDevInfo.struRegInfo.byDevProtocolVersion);
-                lock (deviceDict)
-                    deviceDict[deviceInfo.LoginID] = deviceInfo;
-                DeviceOnline?.Invoke(this, deviceInfo);
+                var device = new DeviceContext(iUserID, struDevInfo);
+                Task.Delay(1000).ContinueWith(t =>
+                {
+                    device.RefreshDeviceInfo();
+                    lock (deviceDict)
+                        deviceDict[device.LoginID] = device;
+                    //通知设备上线
+                    DeviceOnline?.Invoke(this, device);
+                });
 
                 if (pInBuffer == IntPtr.Zero)
                 {
@@ -107,7 +109,7 @@ namespace Hikvision.ISUPSDK.Api
             //如果是设备下线回调
             else if (ENUM_DEV_OFF == dwDataType)
             {
-                DeviceInfo deviceInfo = null;
+                DeviceContext deviceInfo = null;
                 lock (deviceDict)
                 {
                     if (!deviceDict.ContainsKey(iUserID))

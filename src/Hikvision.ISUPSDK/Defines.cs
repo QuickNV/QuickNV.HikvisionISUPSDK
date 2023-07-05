@@ -9,6 +9,12 @@ namespace Hikvision.ISUPSDK
 {
     public class Defines
     {
+        public const uint NET_EHOME_GET_DEVICE_INFO = 1;    //获取设备信息
+        public const int NET_EHOME_GET_VERSION_INFO = 2;    //获取版本信息
+        public const int NET_EHOME_GET_DEVICE_CFG = 3;    //获取设备基本参数
+        public const int NET_EHOME_SET_DEVICE_CFG = 4;    //设置设备基本参数
+        public const int NET_EHOME_GET_NETWORK_CFG = 5;    //获取网络参数
+        public const int NET_EHOME_SET_NETWORK_CFG = 6;    //设置网络参数
 
         //开启关闭监听
         public const int    ENUM_UNKNOWN = -1;
