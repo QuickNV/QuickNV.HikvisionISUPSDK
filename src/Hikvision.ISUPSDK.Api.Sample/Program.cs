@@ -9,6 +9,12 @@ var options = new CmsContextOptions()
 };
 var context = new CmsContext(options);
 context.DeviceOnline += Context_DeviceOnline;
+context.DeviceOffline += Context_DeviceOffline;
+
+void Context_DeviceOffline(object? sender, DeviceInfo e)
+{
+    Console.WriteLine("设备下线！" + JsonConvert.SerializeObject(e, Formatting.Indented));
+}
 
 void Context_DeviceOnline(object? sender, DeviceInfo e)
 {

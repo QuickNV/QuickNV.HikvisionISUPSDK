@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Xml;
@@ -11,6 +12,7 @@ namespace Hikvision.ISUPSDK.Api
     {
         private CmsContextOptions options;
         private int listenHandle;
+        private Dictionary<int, DeviceInfo> deviceDict = new Dictionary<int, DeviceInfo>();
         public CmsContext(CmsContextOptions options)
         {
             this.options = options;
@@ -18,11 +20,14 @@ namespace Hikvision.ISUPSDK.Api
 
         public static void Init()
         {
-            SetWorkingDirToNativeDir();
+            INIT_NATIVE_FILES();
             Invoke(NET_ECMS_Init());
         }
+
         public void Start()
         {
+            lock (deviceDict)
+                deviceDict.Clear();
             var cmd_listen_param = new NET_EHOME_CMS_LISTEN_PARAM();
             cmd_listen_param.struAddress.Init();
             options.ListenIPAddress.CopyTo(0, cmd_listen_param.struAddress.szIP, 0, options.ListenIPAddress.Length);
@@ -30,7 +35,6 @@ namespace Hikvision.ISUPSDK.Api
             cmd_listen_param.fnCB = onDEVICE_REGISTER_CB;
             cmd_listen_param.byRes = new byte[32];
             listenHandle = Invoke(NET_ECMS_StartListen(ref cmd_listen_param));
-            RestoreWorkingDir();
         }
 
         public void Stop()
@@ -39,6 +43,7 @@ namespace Hikvision.ISUPSDK.Api
         }
 
         public event EventHandler<DeviceInfo> DeviceOnline;
+        public event EventHandler<DeviceInfo> DeviceOffline;
 
         private string ByteArray2String(byte[] buffer)
         {
@@ -75,6 +80,8 @@ namespace Hikvision.ISUPSDK.Api
                 deviceInfo.Port = struDevInfo.struRegInfo.struDevAdd.wPort;
                 deviceInfo.Type = struDevInfo.struRegInfo.dwDevType;
                 deviceInfo.ProtocolVersion = ByteArray2String(struDevInfo.struRegInfo.byDevProtocolVersion);
+                lock (deviceDict)
+                    deviceDict[deviceInfo.LoginID] = deviceInfo;
                 DeviceOnline?.Invoke(this, deviceInfo);
 
                 if (pInBuffer == IntPtr.Zero)
@@ -100,15 +107,15 @@ namespace Hikvision.ISUPSDK.Api
             //如果是设备下线回调
             else if (ENUM_DEV_OFF == dwDataType)
             {
-                Console.WriteLine("设备下线！");
-                //Marshal.StructureToPtr(iUserID, ptrTemp, false);
-
-                //Message mes = new Message();
-                //mes.Msg = ISUPDemo.WM_DEL_DEV;
-                //mes.LParam = ptrTemp;
-                //g_deviceTree.ProDevStatu(mes);
-
-                //PostMessage(m_treeHandle, ISUPDemo.WM_DEL_DEV, ptrTemp, ptrTemp);
+                DeviceInfo deviceInfo = null;
+                lock (deviceDict)
+                {
+                    if (!deviceDict.ContainsKey(iUserID))
+                        return true;
+                    deviceInfo = deviceDict[iUserID];
+                    deviceDict.Remove(iUserID);
+                }
+                DeviceOffline?.Invoke(this, deviceInfo);
                 return false;
             }
             //如果是Ehome5.0设备认证回调

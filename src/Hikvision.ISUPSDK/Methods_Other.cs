@@ -1,31 +1,70 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
 
 namespace Hikvision.ISUPSDK
 {
     public partial class Methods
     {
-        private static bool IsWindows = Environment.OSVersion.Platform == PlatformID.Win32NT;
-        private static string preWorkingDir;
-        public static void SetWorkingDirToNativeDir()
+        private static bool IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+
+        public static string[] GET_LINUX_NATIVE_FILES()
         {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                return;
-            var nativeDir = $"runtimes/linux-{RuntimeInformation.ProcessArchitecture.ToString().ToLower()}/native";
-            preWorkingDir = Environment.CurrentDirectory;
-            Environment.CurrentDirectory = Path.GetFullPath(nativeDir);
+            return new[]
+            {
+                "HCAapSDKCom/libiconv2.so",
+                "HCAapSDKCom/libSystemTransform.so",
+                "libcrypto.so",
+                "libcrypto.so.1.0.0",
+                "libHCISUPAlarm.so",
+                "libHCISUPCMS.so",
+                "libHCISUPSS.so",
+                "libHCISUPStream.so",
+                "libHCNetUtils.so",
+                "libhpr.so",
+                "libNPQos.so",
+                "libsqlite3.so",
+                "libssl.so",
+                "libssl.so.1.0.0",
+                "libz.so"
+            };
+        }
+        public static string GET_NATIVE_DIR_PATH()
+        {
+            string os;
+            var arch = RuntimeInformation.ProcessArchitecture.ToString().ToLower();
+            if (IsWindows)
+                os = "win7";
+            else
+                os = "linux";
+            var nativeDir = $"runtimes/{os}-{arch}/native";
+            nativeDir = Path.GetFullPath(nativeDir);
+            return nativeDir;
         }
 
-        public static void RestoreWorkingDir()
+        public static void INIT_NATIVE_FILES()
         {
-            if (string.IsNullOrEmpty(preWorkingDir))
+            if (IsWindows)
                 return;
-            Thread.Sleep(5000);
-            Environment.CurrentDirectory = preWorkingDir;
+
+            var nativeDir = GET_NATIVE_DIR_PATH();
+            var workingDir = Environment.CurrentDirectory;
+            foreach (var path in GET_LINUX_NATIVE_FILES())
+            {
+                var srcFi = new FileInfo(Path.Combine(nativeDir, path));
+                if (!srcFi.Exists)
+                    continue;
+                var desFi = new FileInfo(Path.Combine(workingDir, path));
+                //如果文件存在，则大小相等，修改时间相同
+                if (desFi.Exists
+                    && desFi.Length == srcFi.Length
+                    && desFi.LastWriteTime == srcFi.LastWriteTime)
+                    continue;
+                var desDi = desFi.Directory;
+                if (!desDi.Exists)
+                    desDi.Create();
+                srcFi.CopyTo(desFi.FullName, true);
+            }
         }
 
         public static int Invoke(int result)

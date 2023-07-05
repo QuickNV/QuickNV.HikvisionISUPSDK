@@ -9,8 +9,7 @@ short listenPort = 7660;
 
 try
 {
-    SetWorkingDirToNativeDir();
-
+    INIT_NATIVE_FILES();
     Invoke(NET_ECMS_Init());
     Console.WriteLine("初始化成功！");
 
@@ -182,7 +181,6 @@ try
     Console.WriteLine($"正在监听：{listenIPAddress}:{listenPort}...");
     var listenHandle = Invoke(NET_ECMS_StartListen(ref cmd_listen_param));
     Console.WriteLine("开始监听！");
-    RestoreWorkingDir();
 
     Console.ReadLine();
     NET_ECMS_StopListen(listenHandle);
