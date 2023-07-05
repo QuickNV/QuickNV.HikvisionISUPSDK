@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<Authors>aaasoft</Authors>
+		<PackageProjectUrl>https://github.com/aaasoft/Hikvision.ISUPSDK</PackageProjectUrl>
+		<PackageTags>Hikvision, SDK</PackageTags>
+		<RepositoryUrl>https://github.com/aaasoft/Hikvision.ISUPSDK.git</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<Description>Hikvision.ISUPSDK原始API</Description>
+		<Version>2.5.0.35-preview1</Version>
+		<PackageIcon>logo.png</PackageIcon>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\logo.png">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Hikvision.ISUPSDK.Native" Version="2.5.0.35-preview1" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="README.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
+</Project>
