@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using static Hikvision.ISUPSDK.Defines;
@@ -34,9 +35,26 @@ namespace Hikvision.ISUPSDK
         {
             if (IsWindows)
                 return Methods_Win.NET_ECMS_Init();
-            else
+            var nativeDir = string.Empty;
+            switch (RuntimeInformation.OSArchitecture)
+            {
+                case Architecture.X64:
+                    nativeDir = "runtimes/linux-x64/native";
+                    break;
+                case Architecture.X86:
+                    nativeDir = "runtimes/linux-x86/native";
+                    break;
+            }
+            if (string.IsNullOrEmpty(nativeDir))
                 return Methods_Linux.NET_ECMS_Init();
+
+            var preWorkDir = Environment.CurrentDirectory;
+            Environment.CurrentDirectory = Path.GetFullPath(nativeDir);
+            var ret = Methods_Linux.NET_ECMS_Init();
+            Environment.CurrentDirectory = preWorkDir;
+            return ret;
         }
+
         public static bool NET_ECMS_Fini()
         {
             if (IsWindows)

@@ -6,7 +6,7 @@ namespace Hikvision.ISUPSDK
 {
     internal class Methods_Linux
     {
-        public const string DllPath = "hcisupcms.so";
+        public const string DllPath = "HCISUPCMS.so";
 
         [DllImport(DllPath)]
         public static extern bool NET_ECMS_Init();
