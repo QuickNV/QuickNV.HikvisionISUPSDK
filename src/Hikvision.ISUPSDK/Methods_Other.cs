@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 namespace Hikvision.ISUPSDK
@@ -29,6 +30,7 @@ namespace Hikvision.ISUPSDK
                 "libz.so"
             };
         }
+
         public static string GET_NATIVE_DIR_PATH()
         {
             string os;
@@ -38,7 +40,6 @@ namespace Hikvision.ISUPSDK
             else
                 os = "linux";
             var nativeDir = $"runtimes/{os}-{arch}/native";
-            nativeDir = Path.GetFullPath(nativeDir);
             return nativeDir;
         }
 
@@ -47,14 +48,16 @@ namespace Hikvision.ISUPSDK
             if (IsWindows)
                 return;
 
+            var programDir = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
             var nativeDir = GET_NATIVE_DIR_PATH();
-            var workingDir = Environment.CurrentDirectory;
+            nativeDir = Path.Combine(programDir, nativeDir);
+
             foreach (var path in GET_LINUX_NATIVE_FILES())
             {
                 var srcFi = new FileInfo(Path.Combine(nativeDir, path));
                 if (!srcFi.Exists)
                     continue;
-                var desFi = new FileInfo(Path.Combine(workingDir, path));
+                var desFi = new FileInfo(Path.Combine(programDir, path));
                 //如果文件存在，则大小相等，修改时间相同
                 if (desFi.Exists
                     && desFi.Length == srcFi.Length
