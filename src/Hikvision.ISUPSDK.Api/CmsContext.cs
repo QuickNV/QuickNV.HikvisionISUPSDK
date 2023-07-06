@@ -76,16 +76,24 @@ namespace Hikvision.ISUPSDK.Api
             //如果是设备上线回调
             if (ENUM_DEV_ON == dwDataType)
             {
-                var device = new DeviceContext(iUserID, struDevInfo);
+                var device = new DeviceContext(options, iUserID, struDevInfo);
+                //1秒后获取设备信息
                 Task.Delay(1000).ContinueWith(t =>
                 {
-                    device.RefreshDeviceInfo();
+                    try
+                    {
+                        device.RefreshDeviceInfo();
+                        device.RefreshDeviceCfg();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.ToString());
+                    }
                     lock (deviceDict)
                         deviceDict[device.LoginID] = device;
                     //通知设备上线
                     DeviceOnline?.Invoke(this, device);
                 });
-
                 if (pInBuffer == IntPtr.Zero)
                 {
                     return false;
@@ -160,30 +168,7 @@ namespace Hikvision.ISUPSDK.Api
             //如果是设备地址发生变化回调
             else if (ENUM_DEV_ADDRESS_CHANGED == dwDataType)
             {
-                //Marshal.StructureToPtr(struTemp, ptrTemp, false);
 
-                ////m_ConvertModel.UTF82A(struDevInfo.struRegInfo.byDeviceID, struDevInfo.struRegInfo.byDeviceID, MAX_DEVICE_ID_LEN, ref iOutLen);
-                ////m_ConvertModel.UTF82A(struDevInfo.struRegInfo.sDeviceSerial, struDevInfo.struRegInfo.sDeviceSerial, NET_EHOME_SERIAL_LEN, ref iOutLen);
-
-                //struDevInfo.struRegInfo.byDeviceID.CopyTo(struTemp.byDeviceID, 0);
-                //struTemp.iLoginID = iUserID;
-                //struDevInfo.struRegInfo.sDeviceSerial.CopyTo(struTemp.sDeviceSerial, 0);
-
-
-                //byte[] szDeviceSerial = new byte[NET_EHOME_SERIAL_LEN + 1];
-                //struDevInfo.struRegInfo.sDeviceSerial.CopyTo(szDeviceSerial, 0);
-                //if (2 == struDevInfo.struRegInfo.byDevProtocolVersion[0])
-                //{
-                //    struTemp.dwVersion = 2;
-                //}
-                //else if (4 == struDevInfo.struRegInfo.byDevProtocolVersion[0])
-                //{
-                //    struTemp.dwVersion = 4;
-                //}
-                //else
-                //{
-                //    struTemp.dwVersion = 5;
-                //}
             }
             return true;
         }

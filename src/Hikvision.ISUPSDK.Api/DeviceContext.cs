@@ -9,6 +9,8 @@ namespace Hikvision.ISUPSDK.Api
 {
     public class DeviceContext
     {
+        private CmsContextOptions options;
+
         /// <summary>
         /// 登录编号
         /// </summary>
@@ -17,6 +19,8 @@ namespace Hikvision.ISUPSDK.Api
         /// 设备编号
         /// </summary>
         public string Id { get; private set; }
+        public string Name { get; private set; }
+
         /// <summary>
         /// 序列号
         /// </summary>
@@ -74,17 +78,18 @@ namespace Hikvision.ISUPSDK.Api
         /// </summary>
         public uint ChannelAmount { get; private set; }
 
-        public DeviceContext(int iUserID, NET_EHOME_DEV_REG_INFO_V12 struDevInfo)
+        public DeviceContext(CmsContextOptions options, int iUserID, NET_EHOME_DEV_REG_INFO_V12 struDevInfo)
         {
+            this.options = options;
             LoginID = iUserID;
-            Id = StringUtils.ByteArray2String(struDevInfo.struRegInfo.byDeviceID);
-            SessionKey = StringUtils.ByteArray2String(struDevInfo.struRegInfo.bySessionKey);
-            Serial = StringUtils.ByteArray2String(struDevInfo.struRegInfo.sDeviceSerial);
-            FirmwareVersion = StringUtils.ByteArray2String(struDevInfo.struRegInfo.byFirmwareVersion);
+            Id = StringUtils.ByteArray2String(struDevInfo.struRegInfo.byDeviceID, options.Encoding);
+            SessionKey = StringUtils.ByteArray2String(struDevInfo.struRegInfo.bySessionKey, options.Encoding);
+            Serial = StringUtils.ByteArray2String(struDevInfo.struRegInfo.sDeviceSerial, options.Encoding);
+            FirmwareVersion = StringUtils.ByteArray2String(struDevInfo.struRegInfo.byFirmwareVersion, options.Encoding);
             IPAddress = new string(struDevInfo.struRegInfo.struDevAdd.szIP).Trim(char.MinValue);
             Port = struDevInfo.struRegInfo.struDevAdd.wPort;
             DevType = struDevInfo.struRegInfo.dwDevType;
-            ProtocolVersion = StringUtils.ByteArray2String(struDevInfo.struRegInfo.byDevProtocolVersion);
+            ProtocolVersion = StringUtils.ByteArray2String(struDevInfo.struRegInfo.byDevProtocolVersion, options.Encoding);
         }
 
         /// <summary>
@@ -117,15 +122,50 @@ namespace Hikvision.ISUPSDK.Api
                 ChannelAmount = struDevInfo.dwChannelAmount;
                 StartChannel = struDevInfo.dwStartChannel;
                 ChannelNumber = struDevInfo.dwChannelNumber;
-                Serial = StringUtils.ByteArray2String(struDevInfo.sSerialNumber);
+                Serial = StringUtils.ByteArray2String(struDevInfo.sSerialNumber, options.Encoding);
                 DevType = (int)struDevInfo.dwDevType;
                 DevClass = struDevInfo.wDevClass;
-                SIMCardPhoneNum = StringUtils.ByteArray2String(struDevInfo.sSIMCardPhoneNum);
-                SIMCardSN = StringUtils.ByteArray2String(struDevInfo.sSIMCardSN);
+                SIMCardPhoneNum = StringUtils.ByteArray2String(struDevInfo.sSIMCardPhoneNum, options.Encoding);
+                SIMCardSN = StringUtils.ByteArray2String(struDevInfo.sSIMCardSN, options.Encoding);
             }
             finally
             {
                 Marshal.FreeHGlobal(ptrDevInfo);
+                Marshal.FreeHGlobal(ptrCfg);
+            }
+        }
+
+        /// <summary>
+        /// 刷新设备基本信息
+        /// </summary>
+        public void RefreshDeviceCfg()
+        {
+            NET_EHOME_DEVICE_CFG struDevCfg = new NET_EHOME_DEVICE_CFG();
+            NET_EHOME_CONFIG struCfg = new NET_EHOME_CONFIG();
+            struDevCfg.sServerName = new byte[MAX_DEVICE_NAME_LEN];
+            struDevCfg.sSerialNumber = new byte[MAX_SERIALNO_LEN];
+            struDevCfg.byRes = new byte[292];
+            struDevCfg.dwSize = Marshal.SizeOf(struDevCfg);
+
+            IntPtr ptrDevCfg = Marshal.AllocHGlobal(struDevCfg.dwSize);
+            Marshal.StructureToPtr(struDevCfg, ptrDevCfg, false);
+
+            struCfg.pOutBuf = ptrDevCfg;
+            struCfg.byRes = new byte[40];
+            struCfg.dwOutSize = (uint)struDevCfg.dwSize;
+            uint dwConfigSize = (uint)Marshal.SizeOf(struCfg);
+            IntPtr ptrCfg = Marshal.AllocHGlobal(Marshal.SizeOf(struCfg));
+            try
+            {
+                Invoke(NET_ECMS_GetDevConfig(LoginID, NET_EHOME_GET_DEVICE_CFG, ref struCfg, dwConfigSize));
+                struDevCfg = (NET_EHOME_DEVICE_CFG)Marshal.PtrToStructure(ptrDevCfg, typeof(NET_EHOME_DEVICE_CFG));
+                //更新设备信息
+                Name = StringUtils.ByteArray2String(struDevCfg.sServerName, options.Encoding);
+                Serial = StringUtils.ByteArray2String(struDevCfg.sSerialNumber, options.Encoding);
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(ptrDevCfg);
                 Marshal.FreeHGlobal(ptrCfg);
             }
         }

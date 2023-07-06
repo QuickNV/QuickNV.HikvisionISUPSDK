@@ -63,6 +63,33 @@ namespace Hikvision.ISUPSDK
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 40, ArraySubType = UnmanagedType.U1)]
             public byte[] byRes;    //保留
         }
+        
+        [StructLayoutAttribute(LayoutKind.Sequential)]
+        public struct NET_EHOME_DEVICE_CFG
+        {
+            public int dwSize;                //结构体大小
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = MAX_DEVICE_NAME_LEN)]
+            public byte[] sServerName;          //设备名称
+            public uint dwServerID; //设备或遥控器编号，范围从 0 到 255。
+            public uint dwRecycleRecord; //是否支持循环录像：0-否，1-是
+            public uint dwServerType;//设备类型
+            public uint dwChannelNum;//通道个数（包括模拟和数字通道）
+            public uint dwHardDiskNum;//硬盘个数
+            public uint dwAlarmInNum;//模拟通道关联的报警输入个数
+            public uint dwAlarmOutNum;//模拟通道关联的报警输出个数
+            public uint dwRS232Num;//RS-232 串口个数
+            public uint dwRS485Num;//RS-485 串口个数
+            public uint dwNetworkPortNum;//网口个数
+            public uint dwAuxoutNum;//辅口个数
+            public uint dwAudioNum;//音频端口个数
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = MAX_SERIALNO_LEN)]
+            public byte[] sSerialNumber;          //设备序列号
+            public uint dwMajorScale;//是否支持主口缩放：0-否，1-是。
+            public uint dwMinorScale;//是否支持辅口缩放：0-否，1-是。
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 292)]
+            public byte[] byRes;          //保留
+
+        }
 
         [StructLayoutAttribute(LayoutKind.Sequential)]
         public struct NET_EHOME_DEVICE_INFO

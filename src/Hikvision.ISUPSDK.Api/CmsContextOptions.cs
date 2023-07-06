@@ -9,5 +9,6 @@ namespace Hikvision.ISUPSDK.Api
         public string ListenIPAddress { get; set; } = "0.0.0.0";
         public int ListenPort { get; set; } = 7660;
         public CmsAccessSecurity AccessSecurity { get; set; } = CmsAccessSecurity.CompatibleMode;
+        public Encoding Encoding { get; set; } = Encoding.UTF8;
     }
 }
