@@ -84,6 +84,7 @@ namespace Hikvision.ISUPSDK.Api
                     {
                         device.RefreshDeviceInfo();
                         device.RefreshDeviceCfg();
+                        device.RefreshChannels();
                     }
                     catch (Exception ex)
                     {

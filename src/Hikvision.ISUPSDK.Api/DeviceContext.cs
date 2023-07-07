@@ -97,22 +97,14 @@ namespace Hikvision.ISUPSDK.Api
         /// </summary>
         public void RefreshDeviceInfo()
         {
-            NET_EHOME_DEVICE_INFO struDevInfo = new NET_EHOME_DEVICE_INFO();
-            NET_EHOME_CONFIG struCfg = new NET_EHOME_CONFIG();
-            struDevInfo.sSerialNumber = new byte[MAX_SERIALNO_LEN];
-            struDevInfo.sSIMCardSN = new byte[MAX_SERIALNO_LEN];
-            struDevInfo.sSIMCardPhoneNum = new byte[MAX_PHOMENUM_LEN];
-            struDevInfo.byRes = new byte[160];
-            struDevInfo.dwSize = Marshal.SizeOf(struDevInfo);
-
+            NET_EHOME_DEVICE_INFO struDevInfo = NET_EHOME_DEVICE_INFO.NewInstance();
             IntPtr ptrDevInfo = Marshal.AllocHGlobal(struDevInfo.dwSize);
             Marshal.StructureToPtr(struDevInfo, ptrDevInfo, false);
 
+            NET_EHOME_CONFIG struCfg = NET_EHOME_CONFIG.NewInstance();
             struCfg.pOutBuf = ptrDevInfo;
-            struCfg.byRes = new byte[40];
             struCfg.dwOutSize = (uint)struDevInfo.dwSize;
             uint dwConfigSize = (uint)Marshal.SizeOf(struCfg);
-            IntPtr ptrCfg = Marshal.AllocHGlobal(Marshal.SizeOf(struCfg));
             try
             {
                 Invoke(NET_ECMS_GetDevConfig(LoginID, NET_EHOME_GET_DEVICE_INFO, ref struCfg, dwConfigSize));
@@ -131,7 +123,6 @@ namespace Hikvision.ISUPSDK.Api
             finally
             {
                 Marshal.FreeHGlobal(ptrDevInfo);
-                Marshal.FreeHGlobal(ptrCfg);
             }
         }
 
@@ -140,21 +131,14 @@ namespace Hikvision.ISUPSDK.Api
         /// </summary>
         public void RefreshDeviceCfg()
         {
-            NET_EHOME_DEVICE_CFG struDevCfg = new NET_EHOME_DEVICE_CFG();
-            NET_EHOME_CONFIG struCfg = new NET_EHOME_CONFIG();
-            struDevCfg.sServerName = new byte[MAX_DEVICE_NAME_LEN];
-            struDevCfg.sSerialNumber = new byte[MAX_SERIALNO_LEN];
-            struDevCfg.byRes = new byte[292];
-            struDevCfg.dwSize = Marshal.SizeOf(struDevCfg);
-
+            NET_EHOME_DEVICE_CFG struDevCfg = NET_EHOME_DEVICE_CFG.NewInstance();
             IntPtr ptrDevCfg = Marshal.AllocHGlobal(struDevCfg.dwSize);
             Marshal.StructureToPtr(struDevCfg, ptrDevCfg, false);
 
+            NET_EHOME_CONFIG struCfg = NET_EHOME_CONFIG.NewInstance();
             struCfg.pOutBuf = ptrDevCfg;
-            struCfg.byRes = new byte[40];
             struCfg.dwOutSize = (uint)struDevCfg.dwSize;
             uint dwConfigSize = (uint)Marshal.SizeOf(struCfg);
-            IntPtr ptrCfg = Marshal.AllocHGlobal(Marshal.SizeOf(struCfg));
             try
             {
                 Invoke(NET_ECMS_GetDevConfig(LoginID, NET_EHOME_GET_DEVICE_CFG, ref struCfg, dwConfigSize));
@@ -166,7 +150,56 @@ namespace Hikvision.ISUPSDK.Api
             finally
             {
                 Marshal.FreeHGlobal(ptrDevCfg);
-                Marshal.FreeHGlobal(ptrCfg);
+            }
+        }
+
+        private NET_EHOME_PIC_CFG getChannelInfo(uint channelId)
+        {
+
+            IntPtr ptrChannelId = Marshal.AllocHGlobal(sizeof(uint));
+            var channelIdBuffer = BitConverter.GetBytes(channelId);
+            Console.WriteLine("channelIdBuffer: " + BitConverter.ToString(channelIdBuffer));
+            if (BitConverter.IsLittleEndian)
+                ByteUtils.Reverse(channelIdBuffer);
+            Console.WriteLine("channelIdBuffer: " + BitConverter.ToString(channelIdBuffer));
+            Marshal.Copy(channelIdBuffer, 0, ptrChannelId, 0);
+
+            NET_EHOME_PIC_CFG struPicCfg = NET_EHOME_PIC_CFG.NewInstance();
+            IntPtr ptrPicCfg = Marshal.AllocHGlobal(struPicCfg.dwSize);
+            Marshal.StructureToPtr(struPicCfg, ptrPicCfg, false);
+
+            NET_EHOME_CONFIG struCfg = NET_EHOME_CONFIG.NewInstance();
+            struCfg.dwCondSize = sizeof(uint);
+            struCfg.pCondBuf = ptrChannelId;
+            struCfg.dwOutSize = (uint)struPicCfg.dwSize;
+            struCfg.pOutBuf = ptrPicCfg;
+            uint dwConfigSize = (uint)Marshal.SizeOf(struCfg);
+
+            try
+            {
+                Console.WriteLine($"开始读取通道[{channelId}]的信息...");
+                Invoke(NET_ECMS_GetDevConfig(LoginID, NET_EHOME_GET_PIC_CFG, ref struCfg, dwConfigSize));
+                struPicCfg = (NET_EHOME_PIC_CFG)Marshal.PtrToStructure(ptrPicCfg, typeof(NET_EHOME_PIC_CFG));
+                var name = StringUtils.ByteArray2String(struPicCfg.byChannelName, options.Encoding);
+                Console.WriteLine($"通道[{channelId}]的名称：{name}");
+                return struPicCfg;
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(ptrChannelId);
+                Marshal.FreeHGlobal(ptrPicCfg);
+            }
+        }
+
+        /// <summary>
+        /// 刷新通道信息
+        /// </summary>
+        public void RefreshChannels()
+        {
+            for (uint i = 0; i < ChannelAmount; i++)
+            {
+                var channelId = StartChannel + i;
+                getChannelInfo(channelId);
             }
         }
     }

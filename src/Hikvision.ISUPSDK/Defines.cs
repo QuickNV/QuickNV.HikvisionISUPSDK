@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 
 namespace Hikvision.ISUPSDK
 {
@@ -62,8 +63,20 @@ namespace Hikvision.ISUPSDK
             public uint dwOutSize;    //[in]，获取时需要用到，表示pOutBuf指向的内存大小， 
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 40, ArraySubType = UnmanagedType.U1)]
             public byte[] byRes;    //保留
+
+            public void Init()
+            {
+                byRes = new byte[40];
+            }
+
+            public static NET_EHOME_CONFIG NewInstance()
+            {
+                var item = new NET_EHOME_CONFIG();
+                item.Init();
+                return item;
+            }
         }
-        
+
         [StructLayoutAttribute(LayoutKind.Sequential)]
         public struct NET_EHOME_DEVICE_CFG
         {
@@ -89,9 +102,59 @@ namespace Hikvision.ISUPSDK
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 292)]
             public byte[] byRes;          //保留
 
+            public void Init()
+            {
+                sServerName = new byte[MAX_DEVICE_NAME_LEN];
+                sSerialNumber = new byte[MAX_SERIALNO_LEN];
+                byRes = new byte[292];
+                dwSize = Marshal.SizeOf(this);
+            }
+
+            public static NET_EHOME_DEVICE_CFG NewInstance()
+            {
+                var item = new NET_EHOME_DEVICE_CFG();
+                item.Init();
+                return item;
+            }
         }
 
-        [StructLayoutAttribute(LayoutKind.Sequential)]
+        [StructLayout(LayoutKind.Sequential)]
+        public struct NET_EHOME_PIC_CFG
+        {
+            public int dwSize;                //结构体大小
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = NAME_LEN)]
+            public byte[] byChannelName;          //通道名称
+            public byte bIsShowChanName;           //是否显示通道名称：0-否，1-是。
+            public ushort wChanNameXPos;  //通道名称显示的 X 轴坐标，按照 704 × 576 来配置，坐标值为 16 的倍数。
+            public ushort wChanNameYPos;  //通道名称显示的 Y 轴坐标，按照 704 × 576 来配置，坐标值为 16 的倍数。
+            public byte bIsShowOSD; //是否显示日期信息：0-否，1-是。
+            public ushort wOSDXPos; //OSD 显示的 X 轴坐标，按照 704 × 576 来配置，坐标值为 16 的倍数。
+            public ushort wOSDYPos; //OSD 显示的 Y 轴坐标，按照 704 × 576 来配置，坐标值为 16 的倍数。
+            public ushort byOSDType; //OSD 格式：年/月/日，0：XXXX-XX-XX(年-月-日)，1：XX-XX-XXXX(月-日-年)，2：XXXX 年 XX月 XX 日，3：XX 月 XX 日 XXXX 年，4：XX-XXXXXX(日-月-年)，5：XX 日 XX 月 XXXX 年
+            public byte byOSDAtrib; //OSD 属性： 0：不显示 OSD， 1：透明，闪烁，2：透明，不闪烁， 3：闪烁，不透明， 4：不透明，不闪烁
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2)]
+            public byte[] byRes1; //保留，设为 0。最大长度为 2 字节。
+            public byte bIsShowWeek; //是否显示星期：0-否，1-是。
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
+            public byte[] byRes;//保留，设为 0。最大长度为 64 字节。
+
+            public void Init()
+            {
+                byChannelName = new byte[NAME_LEN];
+                byRes1 = new byte[2];
+                byRes = new byte[64];
+                dwSize = Marshal.SizeOf(this);
+            }
+
+            public static NET_EHOME_PIC_CFG NewInstance()
+            {
+                var item = new NET_EHOME_PIC_CFG();
+                item.Init();
+                return item;
+            }
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
         public struct NET_EHOME_DEVICE_INFO
         {
             public int dwSize;                //结构体大小
@@ -119,6 +182,22 @@ namespace Hikvision.ISUPSDK
             public ushort wDevClass;            //设备的大类
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 158)]
             public byte[] byRes;            //保留
+
+            public void Init()
+            {
+                sSerialNumber = new byte[MAX_SERIALNO_LEN];
+                sSIMCardSN = new byte[MAX_SERIALNO_LEN];
+                sSIMCardPhoneNum = new byte[MAX_PHOMENUM_LEN];
+                byRes = new byte[158];
+                dwSize = Marshal.SizeOf(this);
+            }
+
+            public static NET_EHOME_DEVICE_INFO NewInstance()
+            {
+                var item = new NET_EHOME_DEVICE_INFO();
+                item.Init();
+                return item;
+            }
         }
 
         [StructLayoutAttribute(LayoutKind.Sequential)]
