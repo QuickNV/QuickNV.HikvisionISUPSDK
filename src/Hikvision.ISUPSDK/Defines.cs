@@ -1,10 +1,6 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Runtime.InteropServices;
-using System.Security.Cryptography;
 
 namespace Hikvision.ISUPSDK
 {
@@ -56,11 +52,11 @@ namespace Hikvision.ISUPSDK
         public struct NET_EHOME_CONFIG
         {
             public IntPtr pCondBuf;    //[in]，条件数据指针，如表示通道号等
-            public uint dwCondSize; //[in]，pCondBuf指向的数据大小
+            public int dwCondSize; //[in]，pCondBuf指向的数据大小
             public IntPtr pInBuf;        //[in]，设置时需要用到，指向结构体的指针
-            public uint dwInSize;    //[in], pInBuf指向的数据大小
+            public int dwInSize;    //[in], pInBuf指向的数据大小
             public IntPtr pOutBuf;        //[out]，获取时需要用到，指向结构体的指针，内存由上层分配
-            public uint dwOutSize;    //[in]，获取时需要用到，表示pOutBuf指向的内存大小， 
+            public int dwOutSize;    //[in]，获取时需要用到，表示pOutBuf指向的内存大小， 
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 40, ArraySubType = UnmanagedType.U1)]
             public byte[] byRes;    //保留
 
@@ -124,13 +120,13 @@ namespace Hikvision.ISUPSDK
             public int dwSize;                //结构体大小
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = NAME_LEN)]
             public byte[] byChannelName;          //通道名称
-            public byte bIsShowChanName;           //是否显示通道名称：0-否，1-是。
-            public ushort wChanNameXPos;  //通道名称显示的 X 轴坐标，按照 704 × 576 来配置，坐标值为 16 的倍数。
-            public ushort wChanNameYPos;  //通道名称显示的 Y 轴坐标，按照 704 × 576 来配置，坐标值为 16 的倍数。
-            public byte bIsShowOSD; //是否显示日期信息：0-否，1-是。
+            public int bIsShowChanName;           //是否显示通道名称：0-否，1-是。
+            public short wChanNameXPos;  //通道名称显示的 X 轴坐标，按照 704 × 576 来配置，坐标值为 16 的倍数。
+            public short wChanNameYPos;  //通道名称显示的 Y 轴坐标，按照 704 × 576 来配置，坐标值为 16 的倍数。
+            public int bIsShowOSD; //是否显示日期信息：0-否，1-是。
             public ushort wOSDXPos; //OSD 显示的 X 轴坐标，按照 704 × 576 来配置，坐标值为 16 的倍数。
             public ushort wOSDYPos; //OSD 显示的 Y 轴坐标，按照 704 × 576 来配置，坐标值为 16 的倍数。
-            public ushort byOSDType; //OSD 格式：年/月/日，0：XXXX-XX-XX(年-月-日)，1：XX-XX-XXXX(月-日-年)，2：XXXX 年 XX月 XX 日，3：XX 月 XX 日 XXXX 年，4：XX-XXXXXX(日-月-年)，5：XX 日 XX 月 XXXX 年
+            public byte byOSDType; //OSD 格式：年/月/日，0：XXXX-XX-XX(年-月-日)，1：XX-XX-XXXX(月-日-年)，2：XXXX 年 XX月 XX 日，3：XX 月 XX 日 XXXX 年，4：XX-XXXXXX(日-月-年)，5：XX 日 XX 月 XXXX 年
             public byte byOSDAtrib; //OSD 属性： 0：不显示 OSD， 1：透明，闪烁，2：透明，不闪烁， 3：闪烁，不透明， 4：不透明，不闪烁
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2)]
             public byte[] byRes1; //保留，设为 0。最大长度为 2 字节。
@@ -352,7 +348,7 @@ namespace Hikvision.ISUPSDK
            public byte[] byRes; 
         }
 
-                //预览请求
+        //预览请求
         [StructLayoutAttribute(LayoutKind.Sequential)]
         public struct NET_EHOME_PREVIEWINFO_IN
         {

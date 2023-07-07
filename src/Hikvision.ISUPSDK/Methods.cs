@@ -115,7 +115,7 @@ namespace Hikvision.ISUPSDK
             else
                 return Methods_Linux.NET_ECMS_StartPushRealStream(lUserID, ref pPushInfoIn, ref pPushInfoOut);
         }
-        public static bool NET_ECMS_GetDevConfig(int lUserID, uint dwCommand, ref NET_EHOME_CONFIG lpConfig, uint dwConfigSize)
+        public static bool NET_ECMS_GetDevConfig(int lUserID, uint dwCommand, ref NET_EHOME_CONFIG lpConfig, int dwConfigSize)
         {
             if (IsWindows)
                 return Methods_Win.NET_ECMS_GetDevConfig(lUserID, dwCommand, ref lpConfig, dwConfigSize);

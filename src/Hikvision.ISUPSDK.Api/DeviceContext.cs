@@ -1,6 +1,8 @@
 ﻿using Hikvision.ISUPSDK.Api.Utils;
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using static Hikvision.ISUPSDK.Defines;
 using static Hikvision.ISUPSDK.Methods;
@@ -64,19 +66,23 @@ namespace Hikvision.ISUPSDK.Api
         /// <summary>
         /// 硬盘数量
         /// </summary>
-        public uint DiskNumber { get; private set; }
+        public int DiskNumber { get; private set; }
         /// <summary>
         /// 起始视频通道号
         /// </summary>
-        public uint StartChannel { get; private set; }
+        public int StartChannel { get; private set; }
         /// <summary>
         /// 模拟通道个数
         /// </summary>
-        public uint ChannelNumber { get; private set; }
+        public int ChannelNumber { get; private set; }
         /// <summary>
         /// 通道总数（包括模拟通道和数字通道）。
         /// </summary>
-        public uint ChannelAmount { get; private set; }
+        public int ChannelAmount { get; private set; }
+        /// <summary>
+        /// 通道信息
+        /// </summary>
+        public ChannelInfo[] Channels { get; private set; }
 
         public DeviceContext(CmsContextOptions options, int iUserID, NET_EHOME_DEV_REG_INFO_V12 struDevInfo)
         {
@@ -103,17 +109,17 @@ namespace Hikvision.ISUPSDK.Api
 
             NET_EHOME_CONFIG struCfg = NET_EHOME_CONFIG.NewInstance();
             struCfg.pOutBuf = ptrDevInfo;
-            struCfg.dwOutSize = (uint)struDevInfo.dwSize;
-            uint dwConfigSize = (uint)Marshal.SizeOf(struCfg);
+            struCfg.dwOutSize = struDevInfo.dwSize;
+            var dwConfigSize = Marshal.SizeOf(struCfg);
             try
             {
                 Invoke(NET_ECMS_GetDevConfig(LoginID, NET_EHOME_GET_DEVICE_INFO, ref struCfg, dwConfigSize));
                 struDevInfo = (NET_EHOME_DEVICE_INFO)Marshal.PtrToStructure(ptrDevInfo, typeof(NET_EHOME_DEVICE_INFO));
                 //更新设备信息
-                DiskNumber = struDevInfo.dwDiskNumber;
-                ChannelAmount = struDevInfo.dwChannelAmount;
-                StartChannel = struDevInfo.dwStartChannel;
-                ChannelNumber = struDevInfo.dwChannelNumber;
+                DiskNumber = (int)struDevInfo.dwDiskNumber;
+                ChannelAmount = (int)struDevInfo.dwChannelAmount;
+                StartChannel = (int)struDevInfo.dwStartChannel;
+                ChannelNumber = (int)struDevInfo.dwChannelNumber;
                 Serial = StringUtils.ByteArray2String(struDevInfo.sSerialNumber, options.Encoding);
                 DevType = (int)struDevInfo.dwDevType;
                 DevClass = struDevInfo.wDevClass;
@@ -137,8 +143,8 @@ namespace Hikvision.ISUPSDK.Api
 
             NET_EHOME_CONFIG struCfg = NET_EHOME_CONFIG.NewInstance();
             struCfg.pOutBuf = ptrDevCfg;
-            struCfg.dwOutSize = (uint)struDevCfg.dwSize;
-            uint dwConfigSize = (uint)Marshal.SizeOf(struCfg);
+            struCfg.dwOutSize = struDevCfg.dwSize;
+            var dwConfigSize = Marshal.SizeOf(struCfg);
             try
             {
                 Invoke(NET_ECMS_GetDevConfig(LoginID, NET_EHOME_GET_DEVICE_CFG, ref struCfg, dwConfigSize));
@@ -153,40 +159,30 @@ namespace Hikvision.ISUPSDK.Api
             }
         }
 
-        private NET_EHOME_PIC_CFG getChannelInfo(uint channelId)
+        private NET_EHOME_PIC_CFG getChannelInfo(int channelId)
         {
-
-            IntPtr ptrChannelId = Marshal.AllocHGlobal(sizeof(uint));
             var channelIdBuffer = BitConverter.GetBytes(channelId);
-            Console.WriteLine("channelIdBuffer: " + BitConverter.ToString(channelIdBuffer));
-            if (BitConverter.IsLittleEndian)
-                ByteUtils.Reverse(channelIdBuffer);
-            Console.WriteLine("channelIdBuffer: " + BitConverter.ToString(channelIdBuffer));
-            Marshal.Copy(channelIdBuffer, 0, ptrChannelId, 0);
+            IntPtr ptrChannel = Marshal.UnsafeAddrOfPinnedArrayElement(channelIdBuffer, 0);
 
             NET_EHOME_PIC_CFG struPicCfg = NET_EHOME_PIC_CFG.NewInstance();
             IntPtr ptrPicCfg = Marshal.AllocHGlobal(struPicCfg.dwSize);
             Marshal.StructureToPtr(struPicCfg, ptrPicCfg, false);
 
             NET_EHOME_CONFIG struCfg = NET_EHOME_CONFIG.NewInstance();
-            struCfg.dwCondSize = sizeof(uint);
-            struCfg.pCondBuf = ptrChannelId;
-            struCfg.dwOutSize = (uint)struPicCfg.dwSize;
+            struCfg.dwCondSize = channelIdBuffer.Length;
+            struCfg.pCondBuf = ptrChannel;
+            struCfg.dwOutSize = struPicCfg.dwSize;
             struCfg.pOutBuf = ptrPicCfg;
-            uint dwConfigSize = (uint)Marshal.SizeOf(struCfg);
+            var dwConfigSize = Marshal.SizeOf(struCfg);
 
             try
             {
-                Console.WriteLine($"开始读取通道[{channelId}]的信息...");
                 Invoke(NET_ECMS_GetDevConfig(LoginID, NET_EHOME_GET_PIC_CFG, ref struCfg, dwConfigSize));
                 struPicCfg = (NET_EHOME_PIC_CFG)Marshal.PtrToStructure(ptrPicCfg, typeof(NET_EHOME_PIC_CFG));
-                var name = StringUtils.ByteArray2String(struPicCfg.byChannelName, options.Encoding);
-                Console.WriteLine($"通道[{channelId}]的名称：{name}");
                 return struPicCfg;
             }
             finally
             {
-                Marshal.FreeHGlobal(ptrChannelId);
                 Marshal.FreeHGlobal(ptrPicCfg);
             }
         }
@@ -196,11 +192,28 @@ namespace Hikvision.ISUPSDK.Api
         /// </summary>
         public void RefreshChannels()
         {
-            for (uint i = 0; i < ChannelAmount; i++)
+            var list = new List<ChannelInfo>();
+            for (int i = 0; i < ChannelAmount; i++)
             {
                 var channelId = StartChannel + i;
-                getChannelInfo(channelId);
+                var ci = getChannelInfo(channelId);
+                list.Add(new ChannelInfo()
+                {
+                    Id = i,
+                    Name = StringUtils.ByteArray2String(ci.byChannelName, options.Encoding),
+                    IsShowChanName = ci.bIsShowChanName,
+                    ChanNameXPos = ci.wChanNameXPos,
+                    ChanNameYPos = ci.wChanNameYPos,
+                    IsShowOSD = ci.bIsShowOSD,
+                    OSDXPos = ci.wOSDXPos,
+                    OSDYPos = ci.wOSDYPos,
+                    OSDType = ci.byOSDType,
+                    OSDAtrib = ci.byOSDAtrib,
+                    Res1 = BitConverter.ToString(ci.byRes1),
+                    IsShowWeek = ci.bIsShowWeek
+                });
             }
+            Channels = list.ToArray();
         }
     }
 }

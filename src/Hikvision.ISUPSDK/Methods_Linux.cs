@@ -39,7 +39,7 @@ namespace Hikvision.ISUPSDK
         [DllImport(DllPath)]
         public static extern bool NET_ECMS_StartPushRealStream(Int32 lUserID, ref NET_EHOME_PUSHSTREAM_IN pPushInfoIn, ref NET_EHOME_PUSHSTREAM_OUT pPushInfoOut); 
         [DllImport(DllPath)]
-        public static extern bool NET_ECMS_GetDevConfig(int lUserID, uint dwCommand, ref NET_EHOME_CONFIG lpConfig, uint dwConfigSize);
+        public static extern bool NET_ECMS_GetDevConfig(int lUserID, uint dwCommand, ref NET_EHOME_CONFIG lpConfig, int dwConfigSize);
         [DllImport(DllPath)]
         public static extern bool NET_ECMS_SetDevConfig(Int32 lUserID, Int32 dwCommand, ref NET_EHOME_CONFIG lpConfig, Int32 dwConfigSize);
         [DllImport(DllPath)]
