@@ -24,9 +24,9 @@ namespace Hikvision.ISUPSDK.Api
         /// 是否显示OSD
         /// </summary>
         public int IsShowOSD { get; set; }
-        public ushort OSDXPos { get; set; }
-        public ushort OSDYPos { get; set; }
-        public ushort OSDType { get; set; }
+        public short OSDXPos { get; set; }
+        public short OSDYPos { get; set; }
+        public short OSDType { get; set; }
         public byte OSDAtrib { get; set; }
         /// <summary>
         /// OSD是否显示星期
