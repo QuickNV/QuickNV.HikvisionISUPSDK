@@ -220,5 +220,28 @@ namespace Hikvision.ISUPSDK.Api
             RefreshDeviceCfg();
             RefreshChannels();
         }
+
+        public void StartPushStream(int channelId, string smsIPAddress, int smsPort)
+        {
+            //预览请求的输入参数
+            var struPreviewIn = NET_EHOME_PREVIEWINFO_IN_V11.NewInstance();
+            struPreviewIn.iChannel = channelId; //通道号
+            struPreviewIn.dwLinkMode = 0; //0-TCP, 1-UDP 
+            struPreviewIn.dwStreamType = 1; //码流类型：0-主码流，1-子码流 2-第三码流
+            options.Encoding.GetBytes(smsIPAddress, 0, smsIPAddress.Length, struPreviewIn.struStreamSever.szIP, 0);
+            struPreviewIn.struStreamSever.wPort = (short)smsPort; //SMS 的端口号，需和监听端口号一致
+                                                                  //预览请求的输出参数
+            var struPreviewOut = NET_EHOME_PREVIEWINFO_OUT.NewInstance();
+            //预览请求
+            Invoke(NET_ECMS_StartGetRealStreamV11(LoginID, ref struPreviewIn, ref struPreviewOut));
+
+            //码流传输请求的输入参数
+            var struPushStreamIn = NET_EHOME_PUSHSTREAM_IN.NewInstance();
+            struPushStreamIn.lSessionID = struPreviewOut.lSessionID; //预览请求的会话 ID
+                                                                     //码流传输请求的输出参数
+            var struPushStreamOut = NET_EHOME_PUSHSTREAM_OUT.NewInstance();
+            //发送请求给设备并开始传输实时码流
+            Invoke(NET_ECMS_StartPushRealStream(LoginID, ref struPushStreamIn, ref struPushStreamOut));
+        }
     }
 }

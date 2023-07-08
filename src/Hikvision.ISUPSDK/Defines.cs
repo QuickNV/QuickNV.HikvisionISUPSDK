@@ -361,7 +361,7 @@ namespace Hikvision.ISUPSDK
                 struStreamSever.Init();
             }
         }
-     
+
         public struct NET_EHOME_PREVIEWINFO_IN_V11
         {
             public int iChannel;
@@ -378,26 +378,51 @@ namespace Hikvision.ISUPSDK
                 byRes = new byte[31];
             }
 
+            public static NET_EHOME_PREVIEWINFO_IN_V11 NewInstance()
+            {
+                var item = new NET_EHOME_PREVIEWINFO_IN_V11();
+                item.Init();
+                return item;
+            }
         }
 
         [StructLayout(LayoutKind.Sequential)]
         public struct NET_EHOME_PREVIEWINFO_OUT
         {
-            public int lSessionID; 
+            public int lSessionID;
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 128)]
             public byte[] byRes;
+
+            public void Init()
+            {
+                byRes = new byte[128];
+            }
+
+            public static NET_EHOME_PREVIEWINFO_OUT NewInstance()
+            {
+                var item = new NET_EHOME_PREVIEWINFO_OUT();
+                item.Init();
+                return item;
+            }
         }
 
         [StructLayout(LayoutKind.Sequential)]
         public struct NET_EHOME_PUSHSTREAM_IN
         {
             public int dwSize;
-            public int lSessionID; 
+            public int lSessionID;
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 128)]
             public byte[] byRes;
             public void Init()
             {
                 byRes = new byte[128];
+                dwSize = Marshal.SizeOf(this);
+            }
+            public static NET_EHOME_PUSHSTREAM_IN NewInstance()
+            {
+                var item = new NET_EHOME_PUSHSTREAM_IN();
+                item.Init();
+                return item;
             }
         }
 
@@ -410,6 +435,14 @@ namespace Hikvision.ISUPSDK
             public void Init()
             {
                 byRes = new byte[128];
+                dwSize = Marshal.SizeOf(this);
+            }
+
+            public static NET_EHOME_PUSHSTREAM_OUT NewInstance()
+            {
+                var item = new NET_EHOME_PUSHSTREAM_OUT();
+                item.Init();
+                return item;
             }
         }
 
