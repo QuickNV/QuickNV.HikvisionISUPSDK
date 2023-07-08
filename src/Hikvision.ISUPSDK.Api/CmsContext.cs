@@ -30,7 +30,7 @@ namespace Hikvision.ISUPSDK.Api
                 deviceDict.Clear();
             //设置访问安全
             var m_struAccessSecure = new NET_EHOME_LOCAL_ACCESS_SECURITY();
-            m_struAccessSecure.dwSize = (uint)Marshal.SizeOf(m_struAccessSecure);
+            m_struAccessSecure.dwSize = Marshal.SizeOf(m_struAccessSecure);
             m_struAccessSecure.byAccessSecurity = (byte)options.AccessSecurity;
             IntPtr ptrAccessSecure = Marshal.AllocHGlobal((int)m_struAccessSecure.dwSize);
             try
@@ -46,7 +46,7 @@ namespace Hikvision.ISUPSDK.Api
             //开始监听
             var cmd_listen_param = new NET_EHOME_CMS_LISTEN_PARAM();
             cmd_listen_param.struAddress.Init();
-            options.ListenIPAddress.CopyTo(0, cmd_listen_param.struAddress.szIP, 0, options.ListenIPAddress.Length);
+            options.Encoding.GetBytes(options.ListenIPAddress, 0, options.ListenIPAddress.Length, cmd_listen_param.struAddress.szIP, 0);
             cmd_listen_param.struAddress.wPort = Convert.ToInt16(options.ListenPort);
             cmd_listen_param.fnCB = onDEVICE_REGISTER_CB;
             cmd_listen_param.byRes = new byte[32];
@@ -61,18 +61,22 @@ namespace Hikvision.ISUPSDK.Api
         public event EventHandler<DeviceContext> DeviceOnline;
         public event EventHandler<DeviceContext> DeviceOffline;
 
-        private bool onDEVICE_REGISTER_CB(int iUserID, int dwDataType, IntPtr pOutBuffer, uint dwOutLen,
-                                                 IntPtr pInBuffer, uint dwInLen, IntPtr pUser)
+        private bool onDEVICE_REGISTER_CB(int iUserID, int dwDataType, IntPtr pOutBuffer, int dwOutLen,
+                                                 IntPtr pInBuffer, int dwInLen, IntPtr pUser)
         {
             NET_EHOME_DEV_REG_INFO_V12 struDevInfo = new NET_EHOME_DEV_REG_INFO_V12();
             struDevInfo.Init();
-            if (pOutBuffer != IntPtr.Zero)
+            switch (dwDataType)
             {
-                if (dwDataType == ENUM_DEV_ON || ENUM_DEV_AUTH == dwDataType || ENUM_DEV_SESSIONKEY == dwDataType || ENUM_DEV_ADDRESS_CHANGED == dwDataType)
-                {
-                    struDevInfo = (NET_EHOME_DEV_REG_INFO_V12)Marshal.PtrToStructure(pOutBuffer, typeof(NET_EHOME_DEV_REG_INFO_V12));
-                }
+                case ENUM_DEV_ON:
+                case ENUM_DEV_AUTH:
+                case ENUM_DEV_SESSIONKEY:
+                case ENUM_DEV_ADDRESS_CHANGED:
+                    if (pOutBuffer != IntPtr.Zero)
+                        struDevInfo = (NET_EHOME_DEV_REG_INFO_V12)Marshal.PtrToStructure(pOutBuffer, typeof(NET_EHOME_DEV_REG_INFO_V12));
+                    break;
             }
+
             //如果是设备上线回调
             if (ENUM_DEV_ON == dwDataType)
             {
@@ -82,9 +86,7 @@ namespace Hikvision.ISUPSDK.Api
                 {
                     try
                     {
-                        device.RefreshDeviceInfo();
-                        device.RefreshDeviceCfg();
-                        device.RefreshChannels();
+                        device.Load();
                     }
                     catch (Exception ex)
                     {

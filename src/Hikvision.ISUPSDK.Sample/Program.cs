@@ -1,10 +1,10 @@
 ﻿using Newtonsoft.Json;
-using System.Net;
 using System.Runtime.InteropServices;
+using System.Text;
 using static Hikvision.ISUPSDK.Defines;
 using static Hikvision.ISUPSDK.Methods;
 
-var listenIPAddress = IPAddress.Any;
+var listenIPAddress = "0.0.0.0";
 short listenPort = 7660;
 
 try
@@ -37,7 +37,7 @@ try
         {
             Console.WriteLine("pOutBuffer is NULL");
         }
-        
+
         //如果是设备上线回调
         if (ENUM_DEV_ON == dwDataType)
         {
@@ -72,7 +72,7 @@ try
             else
             {
                 struTemp.dwVersion = 5;
-            }           
+            }
             //返回服务端信息
             NET_EHOME_SERVER_INFO_V50 struServInfo = new NET_EHOME_SERVER_INFO_V50();
             struServInfo.Init();
@@ -173,7 +173,7 @@ try
     };
     var cmd_listen_param = new NET_EHOME_CMS_LISTEN_PARAM();
     cmd_listen_param.struAddress.Init();
-    listenIPAddress.ToString().CopyTo(cmd_listen_param.struAddress.szIP);
+    Encoding.Default.GetBytes(listenIPAddress, 0, listenIPAddress.Length, cmd_listen_param.struAddress.szIP, 0);
     cmd_listen_param.struAddress.wPort = listenPort;
     cmd_listen_param.fnCB = device_register_cb;
     cmd_listen_param.byRes = new byte[32];

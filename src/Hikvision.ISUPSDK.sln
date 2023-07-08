@@ -5,13 +5,11 @@ VisualStudioVersion = 17.6.33815.320
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hikvision.ISUPSDK", "Hikvision.ISUPSDK\Hikvision.ISUPSDK.csproj", "{322288C6-A31F-4EDF-BFBA-ABBCF2CB4F67}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hikvision.ISUPSDK.Generator", "Hikvision.ISUPSDK.Generator\Hikvision.ISUPSDK.Generator.csproj", "{B8A147D4-C1C1-4BD3-AE9E-53A4A959459C}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hikvision.ISUPSDK.Sample", "Hikvision.ISUPSDK.Sample\Hikvision.ISUPSDK.Sample.csproj", "{EFDE5313-885A-412A-ABF0-ACAF83CA752D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hikvision.ISUPSDK.Api", "Hikvision.ISUPSDK.Api\Hikvision.ISUPSDK.Api.csproj", "{178C6221-7661-485B-ABF8-A2A213FA6EBA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hikvision.ISUPSDK.Api", "Hikvision.ISUPSDK.Api\Hikvision.ISUPSDK.Api.csproj", "{178C6221-7661-485B-ABF8-A2A213FA6EBA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hikvision.ISUPSDK.Api.Sample", "Hikvision.ISUPSDK.Api.Sample\Hikvision.ISUPSDK.Api.Sample.csproj", "{2C5D690C-C5D9-4FBF-A9E9-A19E48896EB4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hikvision.ISUPSDK.Api.Sample", "Hikvision.ISUPSDK.Api.Sample\Hikvision.ISUPSDK.Api.Sample.csproj", "{2C5D690C-C5D9-4FBF-A9E9-A19E48896EB4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +21,6 @@ Global
 		{322288C6-A31F-4EDF-BFBA-ABBCF2CB4F67}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{322288C6-A31F-4EDF-BFBA-ABBCF2CB4F67}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{322288C6-A31F-4EDF-BFBA-ABBCF2CB4F67}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B8A147D4-C1C1-4BD3-AE9E-53A4A959459C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B8A147D4-C1C1-4BD3-AE9E-53A4A959459C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B8A147D4-C1C1-4BD3-AE9E-53A4A959459C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B8A147D4-C1C1-4BD3-AE9E-53A4A959459C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EFDE5313-885A-412A-ABF0-ACAF83CA752D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EFDE5313-885A-412A-ABF0-ACAF83CA752D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EFDE5313-885A-412A-ABF0-ACAF83CA752D}.Release|Any CPU.ActiveCfg = Release|Any CPU

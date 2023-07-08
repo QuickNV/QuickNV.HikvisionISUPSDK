@@ -154,28 +154,28 @@ namespace Hikvision.ISUPSDK
         public struct NET_EHOME_DEVICE_INFO
         {
             public int dwSize;                //结构体大小
-            public uint dwChannelNumber;     //模拟视频通道个数
-            public uint dwChannelAmount;    //总视频通道数（模拟+IP）
-            public uint dwDevType;            //设备类型，1-DVR，3-DVS，30-IPC，40-IPDOME，其他值参考海康NetSdk设备类型号定义值
-            public uint dwDiskNumber;        //设备当前硬盘数
+            public int dwChannelNumber;     //模拟视频通道个数
+            public int dwChannelAmount;    //总视频通道数（模拟+IP）
+            public int dwDevType;            //设备类型，1-DVR，3-DVS，30-IPC，40-IPDOME，其他值参考海康NetSdk设备类型号定义值
+            public int dwDiskNumber;        //设备当前硬盘数
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = MAX_SERIALNO_LEN)]
             public byte[] sSerialNumber;        //设备序列号
-            public uint dwAlarmInPortNum;    //模拟通道报警输入个数
-            public uint dwAlarmInAmount;    //设备总报警输入个数
-            public uint dwAlarmOutPortNum;    //模拟通道报警输出个数
-            public uint dwAlarmOutAmount;    //设备总报警输出个数
-            public uint dwStartChannel;        //视频起始通道号
-            public uint dwAudioChanNum;    //语音对讲通道个数
-            public uint dwMaxDigitChannelNum;    //设备支持的最大数字通道路数
-            public uint dwAudioEncType;        //语音对讲音频格式，0- OggVorbis，1-G711U，2-G711A，3-G726，4-AAC，5-MP2L2,6-PCM
+            public int dwAlarmInPortNum;    //模拟通道报警输入个数
+            public int dwAlarmInAmount;    //设备总报警输入个数
+            public int dwAlarmOutPortNum;    //模拟通道报警输出个数
+            public int dwAlarmOutAmount;    //设备总报警输出个数
+            public int dwStartChannel;        //视频起始通道号
+            public int dwAudioChanNum;    //语音对讲通道个数
+            public int dwMaxDigitChannelNum;    //设备支持的最大数字通道路数
+            public int dwAudioEncType;        //语音对讲音频格式，0- OggVorbis，1-G711U，2-G711A，3-G726，4-AAC，5-MP2L2,6-PCM
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = MAX_SERIALNO_LEN)]
             public byte[] sSIMCardSN;    //车载设备扩展：SIM卡序列号
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = MAX_PHOMENUM_LEN)]
             public byte[] sSIMCardPhoneNum;    //车载扩展：SIM卡手机号码
-            public uint dwSupportZeroChan;    // SupportZeroChan:支持零通道的个数：0-不支持，1-支持1路，2-支持2路，以此类推
-            public uint dwStartZeroChan;        //零通道起始编号，默认10000
-            public uint dwSmartType;            //智能类型，0-smart，1-专业智能；默认0-smart
-            public ushort wDevClass;            //设备的大类
+            public int dwSupportZeroChan;    // SupportZeroChan:支持零通道的个数：0-不支持，1-支持1路，2-支持2路，以此类推
+            public int dwStartZeroChan;        //零通道起始编号，默认10000
+            public int dwSmartType;            //智能类型，0-smart，1-专业智能；默认0-smart
+            public short wDevClass;            //设备的大类
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 158)]
             public byte[] byRes;            //保留
 
@@ -413,8 +413,8 @@ namespace Hikvision.ISUPSDK
             }
         }
 
-        public delegate bool DEVICE_REGISTER_CB(int lUserID, int dwDataType, IntPtr pOutBuffer, uint dwOutLen,
-                                                 IntPtr pInBuffer, uint dwInLen, IntPtr pUser);
+        public delegate bool DEVICE_REGISTER_CB(int lUserID, int dwDataType, IntPtr pOutBuffer, int dwOutLen,
+                                                 IntPtr pInBuffer, int dwInLen, IntPtr pUser);
 
 
         //-----------------------------------------------------------------------------------------------------------
@@ -779,19 +779,19 @@ namespace Hikvision.ISUPSDK
         public const int MAX_MASTER_KEY_LEN = 16;
 
         public const int MAX_URL_LEN_SS = 4096;//图片服务器回调UPL长度
-        
+
         [StructLayoutAttribute(LayoutKind.Sequential)]
         public struct NET_EHOME_IPADDRESS
         {
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 128, ArraySubType = UnmanagedType.U1)]
-            public char[] szIP;
-            public Int16  wPort;     //端口
+            public byte[] szIP;
+            public short wPort;     //端口
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 2)]
             public byte[] byRes;
             public void Init()
             {
                 wPort = 0;
-                szIP = new char[128];
+                szIP = new byte[128];
                 byRes = new byte[2];
             }
         }
@@ -832,7 +832,7 @@ namespace Hikvision.ISUPSDK
         [StructLayoutAttribute(LayoutKind.Sequential)]
         public struct NET_EHOME_LOCAL_ACCESS_SECURITY
         {
-            public UInt32  dwSize;
+            public int  dwSize;
             public byte    byAccessSecurity;    //0-兼容模式（允许任意版本的协议接入），1-普通模式（只支持4.0以下版本，不支持协议安全的版本接入） 2-安全模式（只允许4.0以上版本，支持协议安全的版本接入）
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 127)]
             public byte[]  byRes;
@@ -966,7 +966,7 @@ namespace Hikvision.ISUPSDK
                 bEnable             = false;
                 iChanType           = DEMO_CHANNEL_TYPE.DEMO_CHANNEL_TYPE_INVALID;
                 dwImageType         = CHAN_ORIGINAL;
-                struIP.szIP = new char[128];
+                struIP.szIP = new byte[128];
                 struIP.byRes = new byte[32];
                 struIP.wPort = 8000;
                 iPlayWndIndex = -1;

@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using static Hikvision.ISUPSDK.Defines;
 using static Hikvision.ISUPSDK.Methods;
@@ -54,7 +53,7 @@ namespace Hikvision.ISUPSDK.Api
         /// <summary>
         /// 设备大类
         /// </summary>
-        public ushort DevClass { get; private set; }
+        public short DevClass { get; private set; }
         /// <summary>
         /// 协议版本
         /// </summary>
@@ -92,7 +91,7 @@ namespace Hikvision.ISUPSDK.Api
             SessionKey = StringUtils.ByteArray2String(struDevInfo.struRegInfo.bySessionKey, options.Encoding);
             Serial = StringUtils.ByteArray2String(struDevInfo.struRegInfo.sDeviceSerial, options.Encoding);
             FirmwareVersion = StringUtils.ByteArray2String(struDevInfo.struRegInfo.byFirmwareVersion, options.Encoding);
-            IPAddress = new string(struDevInfo.struRegInfo.struDevAdd.szIP).Trim(char.MinValue);
+            IPAddress = StringUtils.ByteArray2String(struDevInfo.struRegInfo.struDevAdd.szIP, options.Encoding);
             Port = struDevInfo.struRegInfo.struDevAdd.wPort;
             DevType = struDevInfo.struRegInfo.dwDevType;
             ProtocolVersion = StringUtils.ByteArray2String(struDevInfo.struRegInfo.byDevProtocolVersion, options.Encoding);
@@ -114,14 +113,14 @@ namespace Hikvision.ISUPSDK.Api
             try
             {
                 Invoke(NET_ECMS_GetDevConfig(LoginID, NET_EHOME_GET_DEVICE_INFO, ref struCfg, dwConfigSize));
-                struDevInfo = (NET_EHOME_DEVICE_INFO)Marshal.PtrToStructure(ptrDevInfo, typeof(NET_EHOME_DEVICE_INFO));
+                struDevInfo = Marshal.PtrToStructure<NET_EHOME_DEVICE_INFO>(ptrDevInfo);
                 //更新设备信息
-                DiskNumber = (int)struDevInfo.dwDiskNumber;
-                ChannelAmount = (int)struDevInfo.dwChannelAmount;
-                StartChannel = (int)struDevInfo.dwStartChannel;
-                ChannelNumber = (int)struDevInfo.dwChannelNumber;
+                DiskNumber = struDevInfo.dwDiskNumber;
+                ChannelAmount = struDevInfo.dwChannelAmount;
+                StartChannel = struDevInfo.dwStartChannel;
+                ChannelNumber = struDevInfo.dwChannelNumber;
                 Serial = StringUtils.ByteArray2String(struDevInfo.sSerialNumber, options.Encoding);
-                DevType = (int)struDevInfo.dwDevType;
+                DevType = struDevInfo.dwDevType;
                 DevClass = struDevInfo.wDevClass;
                 SIMCardPhoneNum = StringUtils.ByteArray2String(struDevInfo.sSIMCardPhoneNum, options.Encoding);
                 SIMCardSN = StringUtils.ByteArray2String(struDevInfo.sSIMCardSN, options.Encoding);
@@ -148,7 +147,7 @@ namespace Hikvision.ISUPSDK.Api
             try
             {
                 Invoke(NET_ECMS_GetDevConfig(LoginID, NET_EHOME_GET_DEVICE_CFG, ref struCfg, dwConfigSize));
-                struDevCfg = (NET_EHOME_DEVICE_CFG)Marshal.PtrToStructure(ptrDevCfg, typeof(NET_EHOME_DEVICE_CFG));
+                struDevCfg = Marshal.PtrToStructure<NET_EHOME_DEVICE_CFG>(ptrDevCfg);
                 //更新设备信息
                 Name = StringUtils.ByteArray2String(struDevCfg.sServerName, options.Encoding);
                 Serial = StringUtils.ByteArray2String(struDevCfg.sSerialNumber, options.Encoding);
@@ -178,7 +177,7 @@ namespace Hikvision.ISUPSDK.Api
             try
             {
                 Invoke(NET_ECMS_GetDevConfig(LoginID, NET_EHOME_GET_PIC_CFG, ref struCfg, dwConfigSize));
-                struPicCfg = (NET_EHOME_PIC_CFG)Marshal.PtrToStructure(ptrPicCfg, typeof(NET_EHOME_PIC_CFG));
+                struPicCfg = Marshal.PtrToStructure<NET_EHOME_PIC_CFG>(ptrPicCfg);
                 return struPicCfg;
             }
             finally
@@ -209,11 +208,17 @@ namespace Hikvision.ISUPSDK.Api
                     OSDYPos = ci.wOSDYPos,
                     OSDType = ci.byOSDType,
                     OSDAtrib = ci.byOSDAtrib,
-                    Res1 = BitConverter.ToString(ci.byRes1),
                     IsShowWeek = ci.bIsShowWeek
                 });
             }
             Channels = list.ToArray();
+        }
+
+        public void Load()
+        {
+            RefreshDeviceInfo();
+            RefreshDeviceCfg();
+            RefreshChannels();
         }
     }
 }
