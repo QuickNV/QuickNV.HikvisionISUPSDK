@@ -234,6 +234,10 @@ namespace Hikvision.ISUPSDK.Api
             var struPreviewOut = NET_EHOME_PREVIEWINFO_OUT.NewInstance();
             //预览请求
             Invoke(NET_ECMS_StartGetRealStreamV11(LoginID, ref struPreviewIn, ref struPreviewOut));
+            var mediaId = struPreviewOut.lSessionID;
+            var ssrc = MediaStreamUtils.GetSSRC(mediaId);
+            var streamId =MediaStreamUtils.GetStreamId(ssrc);
+            Console.WriteLine($"MediaId:{mediaId},SSRC:{ssrc},StreamId:{streamId}");
 
             //码流传输请求的输入参数
             var struPushStreamIn = NET_EHOME_PUSHSTREAM_IN.NewInstance();

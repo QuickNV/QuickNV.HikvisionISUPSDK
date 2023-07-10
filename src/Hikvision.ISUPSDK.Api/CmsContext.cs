@@ -20,7 +20,7 @@ namespace Hikvision.ISUPSDK.Api
 
         public static void Init()
         {
-            INIT_NATIVE_FILES();
+            SdkManager.Init();
             Invoke(NET_ECMS_Init());
         }
 
