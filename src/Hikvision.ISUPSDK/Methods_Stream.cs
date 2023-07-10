@@ -73,12 +73,20 @@ namespace Hikvision.ISUPSDK
                 return Methods_Linux.NET_ESTREAM_StopPreview(iPreviewHandle);
         }
         
-        public static bool NET_ESTREAM_SetPreviewDataCB(Int32 iHandle, IntPtr pStruCBParam)
+        public static bool NET_ESTREAM_SetPreviewDataCB(Int32 iHandle, ref NET_EHOME_PREVIEW_DATA_CB_PARAM struCBParam)
         {
             if (IsWindows)
-                return Methods_Win.NET_ESTREAM_SetPreviewDataCB(iHandle, pStruCBParam);
+                return Methods_Win.NET_ESTREAM_SetPreviewDataCB(iHandle, ref struCBParam);
             else
-                return Methods_Linux.NET_ESTREAM_SetPreviewDataCB(iHandle, pStruCBParam);
+                return Methods_Linux.NET_ESTREAM_SetPreviewDataCB(iHandle, ref struCBParam);
+        }
+
+        public static bool NET_ESTREAM_SetStandardPreviewDataCB(Int32 iHandle, ref NET_EHOME_PREVIEW_DATA_CB_PARAM struCBParam)
+        {
+            if (IsWindows)
+                return Methods_Win.NET_ESTREAM_SetStandardPreviewDataCB(iHandle, ref struCBParam);
+            else
+                return Methods_Linux.NET_ESTREAM_SetStandardPreviewDataCB(iHandle, ref struCBParam);
         }
 
         public static Int32 NET_ESTREAM_StartListenVoiceTalk(ref NET_EHOME_LISTEN_VOICETALK_CFG pListenParam)

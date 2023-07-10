@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hikvision.ISUPSDK.Api.Utils;
+using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -46,7 +47,7 @@ namespace Hikvision.ISUPSDK.Api
             //开始监听
             var cmd_listen_param = new NET_EHOME_CMS_LISTEN_PARAM();
             cmd_listen_param.struAddress.Init();
-            options.Encoding.GetBytes(options.ListenIPAddress, 0, options.ListenIPAddress.Length, cmd_listen_param.struAddress.szIP, 0);
+            StringUtils.String2ByteArray(options.ListenIPAddress, cmd_listen_param.struAddress.szIP);
             cmd_listen_param.struAddress.wPort = Convert.ToInt16(options.ListenPort);
             cmd_listen_param.fnCB = onDEVICE_REGISTER_CB;
             cmd_listen_param.byRes = new byte[32];

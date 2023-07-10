@@ -824,6 +824,12 @@ namespace Hikvision.ISUPSDK
                 szIP = new byte[128];
                 byRes = new byte[2];
             }
+            public static NET_EHOME_IPADDRESS NewInstance()
+            {
+                var item = new NET_EHOME_IPADDRESS();
+                item.Init();
+                return item;
+            }
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -1084,11 +1090,12 @@ namespace Hikvision.ISUPSDK
         {
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = MAX_DEVICE_ID_LEN)]
             public byte[] szDeviceID;   //设备标示符    
-            public long iSessionID;     //设备分配给该取流会话的ID
-            public long dwChannelNo;    //设备通道号
+            public int iSessionID;     //设备分配给该取流会话的ID
+            public int dwChannelNo;    //设备通道号
             public byte byStreamType;   //0-主码流，1-子码流
-            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 3)]
+            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 2)]
             public byte[] byRes1;
+            public byte byStreamFormat;  //封装格式：0- PS,1-标准流(入参)
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = NET_EHOME_SERIAL_LEN)]
             public byte[] sDeviceSerial;    //设备序列号，数字序列号
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 112)]
@@ -1096,7 +1103,7 @@ namespace Hikvision.ISUPSDK
             public void Init()
             {
                 szDeviceID = new byte[MAX_DEVICE_ID_LEN];
-                byRes1 = new byte[3];
+                byRes1 = new byte[2];
                 sDeviceSerial = new byte[NET_EHOME_SERIAL_LEN];
                 byRes = new byte[112];
             }
@@ -1114,6 +1121,19 @@ namespace Hikvision.ISUPSDK
             public byte byLinkMode;   //0：TCP，1：UDP 2: HRUDP方式
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 127)]
             public byte[] byRes;
+
+            public void Init()
+            {
+                struIPAdress = NET_EHOME_IPADDRESS.NewInstance();
+                byRes = new byte[127];
+            }
+
+            public static NET_EHOME_LISTEN_PREVIEW_CFG NewInstance()
+            {
+                var item = new NET_EHOME_LISTEN_PREVIEW_CFG();
+                item.Init();
+                return item;
+            }
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -1136,6 +1156,11 @@ namespace Hikvision.ISUPSDK
             public IntPtr pUserData;          //用户参数, 在fnPreviewDataCB回调出来
             [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 128)]
             public byte[] byRes;                   //保留
+
+            public void Init()
+            {
+                byRes = new byte[128];
+            }
         }
 
         [StructLayout(LayoutKind.Sequential)]

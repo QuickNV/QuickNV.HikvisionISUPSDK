@@ -115,7 +115,9 @@ namespace Hikvision.ISUPSDK
         [DllImport(StreamDllPath)]
         public static extern bool NET_ESTREAM_StopPreview(Int32 iPreviewHandle);
         [DllImport(StreamDllPath)]
-        public static extern bool NET_ESTREAM_SetPreviewDataCB(Int32 iHandle, IntPtr pStruCBParam);
+        public static extern bool NET_ESTREAM_SetPreviewDataCB(Int32 iHandle, ref NET_EHOME_PREVIEW_DATA_CB_PARAM struCBParam);
+        [DllImport(StreamDllPath)]
+        public static extern bool NET_ESTREAM_SetStandardPreviewDataCB(Int32 iHandle, ref NET_EHOME_PREVIEW_DATA_CB_PARAM struCBParam);
         [DllImport(StreamDllPath)]
         public static extern Int32 NET_ESTREAM_StartListenVoiceTalk(ref NET_EHOME_LISTEN_VOICETALK_CFG pListenParam);
         [DllImport(StreamDllPath)]

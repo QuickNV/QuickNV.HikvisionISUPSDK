@@ -228,7 +228,7 @@ namespace Hikvision.ISUPSDK.Api
             struPreviewIn.iChannel = channelId; //通道号
             struPreviewIn.dwLinkMode = 0; //0-TCP, 1-UDP 
             struPreviewIn.dwStreamType = 1; //码流类型：0-主码流，1-子码流 2-第三码流
-            options.Encoding.GetBytes(smsIPAddress, 0, smsIPAddress.Length, struPreviewIn.struStreamSever.szIP, 0);
+            StringUtils.String2ByteArray(smsIPAddress, struPreviewIn.struStreamSever.szIP);
             struPreviewIn.struStreamSever.wPort = (short)smsPort; //SMS 的端口号，需和监听端口号一致
                                                                   //预览请求的输出参数
             var struPreviewOut = NET_EHOME_PREVIEWINFO_OUT.NewInstance();
@@ -236,7 +236,7 @@ namespace Hikvision.ISUPSDK.Api
             Invoke(NET_ECMS_StartGetRealStreamV11(LoginID, ref struPreviewIn, ref struPreviewOut));
             var mediaId = struPreviewOut.lSessionID;
             var ssrc = MediaStreamUtils.GetSSRC(mediaId);
-            var streamId =MediaStreamUtils.GetStreamId(ssrc);
+            var streamId = MediaStreamUtils.GetStreamId(ssrc);
             Console.WriteLine($"MediaId:{mediaId},SSRC:{ssrc},StreamId:{streamId}");
 
             //码流传输请求的输入参数
