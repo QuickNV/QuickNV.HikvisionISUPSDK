@@ -21,8 +21,6 @@ try
         dwSize = Marshal.SizeOf(typeof(LOCAL_DEVICE_INFO));
         IntPtr ptrTemp = Marshal.AllocHGlobal(dwSize);
 
-
-        int iOutLen = 0;
         NET_EHOME_DEV_REG_INFO_V12 struDevInfo = new NET_EHOME_DEV_REG_INFO_V12();
         struDevInfo.Init();
         if (pOutBuffer != IntPtr.Zero)
@@ -31,7 +29,6 @@ try
             {
                 struDevInfo = (NET_EHOME_DEV_REG_INFO_V12)Marshal.PtrToStructure(pOutBuffer, typeof(NET_EHOME_DEV_REG_INFO_V12));
             }
-
         }
         else
         {

@@ -14,30 +14,30 @@ namespace Hikvision.ISUPSDK
         public const int NET_EHOME_SET_NETWORK_CFG = 6;    //设置网络参数
 
         //开启关闭监听
-        public const int    ENUM_UNKNOWN = -1;
-        public const int    ENUM_DEV_ON = 0;             //设备上线回调
-        public const int    ENUM_DEV_OFF = 1;               //设备下线回调
-        public const int    ENUM_DEV_ADDRESS_CHANGED = 2;     //设备地址发生变化
-        public const int    ENUM_DEV_AUTH = 3;       //Ehome5.0设备认证回调
-        public const int    ENUM_DEV_SESSIONKEY = 4;    //Ehome5.0设备Sessionkey回调
-        public const int    ENUM_DEV_DAS_REQ = 5;      //Ehome5.0设备重定向请求回调
-        public const int    ENUM_DEV_SESSIONKEY_REQ = 6;//EHome5.0设备sessionkey请求回调
-        public const int    ENUM_DEV_DAS_REREGISTER = 7;//设备重注册回调
-        public const int    MAX_DEVNAME_LEN=32;
+        public const int ENUM_UNKNOWN = -1;
+        public const int ENUM_DEV_ON = 0;             //设备上线回调
+        public const int ENUM_DEV_OFF = 1;               //设备下线回调
+        public const int ENUM_DEV_ADDRESS_CHANGED = 2;     //设备地址发生变化
+        public const int ENUM_DEV_AUTH = 3;       //Ehome5.0设备认证回调
+        public const int ENUM_DEV_SESSIONKEY = 4;    //Ehome5.0设备Sessionkey回调
+        public const int ENUM_DEV_DAS_REQ = 5;      //Ehome5.0设备重定向请求回调
+        public const int ENUM_DEV_SESSIONKEY_REQ = 6;//EHome5.0设备sessionkey请求回调
+        public const int ENUM_DEV_DAS_REREGISTER = 7;//设备重注册回调
+        public const int MAX_DEVNAME_LEN = 32;
 
         //OpenSSL路径
         public const int NET_EHOME_CMS_INIT_CFG_LIBEAY_PATH = 0;   //设置OpenSSL的libeay32.dll/libcrypto.so所在路径
         public const int NET_EHOME_CMS_INIT_CFG_SSLEAY_PATH = 1;   //设置OpenSSL的ssleay32.dll/libssl.so所在
 
         //通道类型
-        public const int    DEMO_CHANNEL_TYPE_INVALID = -1;
-        public const int    DEMO_CHANNEL_TYPE_ANALOG = 0;
-        public const int    DEMO_CHANNEL_TYPE_IP = 1;
-        public const int    DEMO_CHANNEL_TYPE_ZERO = 2; //零通道
-       
-        public const int    MAX_SERIALNO_LEN = 128;    //序列号最大长度
-        public const int    MAX_PHOMENUM_LEN = 32;     //手机号码最大长度
-        public const int    MAX_DEVICE_NAME_LEN = 32;  //设备名称长度
+        public const int DEMO_CHANNEL_TYPE_INVALID = -1;
+        public const int DEMO_CHANNEL_TYPE_ANALOG = 0;
+        public const int DEMO_CHANNEL_TYPE_IP = 1;
+        public const int DEMO_CHANNEL_TYPE_ZERO = 2; //零通道
+
+        public const int MAX_SERIALNO_LEN = 128;    //序列号最大长度
+        public const int MAX_PHOMENUM_LEN = 32;     //手机号码最大长度
+        public const int MAX_DEVICE_NAME_LEN = 32;  //设备名称长度
         public const int NET_EHOME_GET_GPS_CFG = 20; //获取GPS参数
         public const int NET_EHOME_SET_GPS_CFG = 21; //设置GPS参数
         public const int NET_EHOME_GET_PIC_CFG = 22; //获取OSD显示参数
@@ -199,15 +199,15 @@ namespace Hikvision.ISUPSDK
         [StructLayout(LayoutKind.Sequential)]
         public struct NET_EHOME_DEV_REG_INFO
         {
-            public int  dwSize; 
-            public int  dwNetUnitType;            //根据EHomeSDK协议预留，目前没有意义
+            public int dwSize;
+            public int dwNetUnitType;            //根据EHomeSDK协议预留，目前没有意义
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = MAX_DEVICE_ID_LEN)]
             public byte[] byDeviceID; //设备ID
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 24)]
             public byte[] byFirmwareVersion;    //固件版本
-            public      NET_EHOME_IPADDRESS struDevAdd;         //设备注册上来是，设备的本地地址
-            public int  dwDevType;                  //设备类型
-            public int  dwManufacture;              //设备厂家代码
+            public NET_EHOME_IPADDRESS struDevAdd;         //设备注册上来是，设备的本地地址
+            public int dwDevType;                  //设备类型
+            public int dwManufacture;              //设备厂家代码
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
             public byte[] byPassWord;             //设备登陆CMS的密码，由用户自行根据需求进行验证
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = NET_EHOME_SERIAL_LEN/*12*/)]
@@ -256,13 +256,13 @@ namespace Hikvision.ISUPSDK
         {
             public NET_EHOME_IPADDRESS struAdd;         //服务器地址
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = NAME_LEN/*32*/)]
-            public byte[]    byServerName;                            //服务器名称
+            public byte[] byServerName;                            //服务器名称
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = NAME_LEN/*32*/)]
-            public byte[]    byUserName;                              //用户名
+            public byte[] byUserName;                              //用户名
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = NAME_LEN/*32*/)]
-            public byte[]    byPassWord;                              //密码
+            public byte[] byPassWord;                              //密码
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64/*64*/)]
-            public byte[]   byRes;
+            public byte[] byRes;
             public void Init()
             {
                 struAdd.Init();
@@ -276,19 +276,19 @@ namespace Hikvision.ISUPSDK
         [StructLayout(LayoutKind.Sequential)]
         public struct NET_EHOME_SERVER_INFO
         {
-            public int                  dwSize;
-            public int                  dwKeepAliveSec;            //心跳间隔（单位：秒,0:默认为15S）
-            public int                  dwTimeOutCount;         //心跳超时次数（0：默认为6）
-            public NET_EHOME_IPADDRESS         struTCPAlarmSever;      //报警服务器地址（TCP协议）
-            public NET_EHOME_IPADDRESS         struUDPAlarmSever;        //报警服务器地址（UDP协议）
-            public int                  dwAlarmServerType;        //报警服务器类型0-只支持UDP协议上报，1-支持UDP、TCP两种协议上报
-            public NET_EHOME_IPADDRESS         struNTPSever;            //NTP服务器地址
-            public int                  dwNTPInterval;            //NTP校时间隔（单位：秒）
-            public NET_EHOME_IPADDRESS         struPictureSever;       //图片服务器地址
-            public int                  dwPicServerType;        //图片服务器类型图片服务器类型，1-VRB图片服务器，0-Tomcat图片服务
-            public NET_EHOME_BLACKLIST_SEVER   struBlackListServer;    //黑名单服务器
+            public int dwSize;
+            public int dwKeepAliveSec;            //心跳间隔（单位：秒,0:默认为15S）
+            public int dwTimeOutCount;         //心跳超时次数（0：默认为6）
+            public NET_EHOME_IPADDRESS struTCPAlarmSever;      //报警服务器地址（TCP协议）
+            public NET_EHOME_IPADDRESS struUDPAlarmSever;        //报警服务器地址（UDP协议）
+            public int dwAlarmServerType;        //报警服务器类型0-只支持UDP协议上报，1-支持UDP、TCP两种协议上报
+            public NET_EHOME_IPADDRESS struNTPSever;            //NTP服务器地址
+            public int dwNTPInterval;            //NTP校时间隔（单位：秒）
+            public NET_EHOME_IPADDRESS struPictureSever;       //图片服务器地址
+            public int dwPicServerType;        //图片服务器类型图片服务器类型，1-VRB图片服务器，0-Tomcat图片服务
+            public NET_EHOME_BLACKLIST_SEVER struBlackListServer;    //黑名单服务器
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 128/*128*/)]
-            public byte[]                   byRes;
+            public byte[] byRes;
             public void Init()
             {
                 struTCPAlarmSever.Init();
@@ -341,11 +341,11 @@ namespace Hikvision.ISUPSDK
         [StructLayout(LayoutKind.Sequential)]
         public struct NET_EHOME_CMS_LISTEN_PARAM
         {
-           public NET_EHOME_IPADDRESS struAddress; //Local Listen Information, when IP is 0.0.0.0，it is local address by default; when with multiple NICs, it is the first one got from the operating system by default 
-           public DEVICE_REGISTER_CB fnCB; //Device Register Callback Function 
-           public IntPtr pUserData;   // User Data 
-           [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
-           public byte[] byRes; 
+            public NET_EHOME_IPADDRESS struAddress; //Local Listen Information, when IP is 0.0.0.0，it is local address by default; when with multiple NICs, it is the first one got from the operating system by default 
+            public DEVICE_REGISTER_CB fnCB; //Device Register Callback Function 
+            public IntPtr pUserData;   // User Data 
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
+            public byte[] byRes;
         }
 
         //预览请求
@@ -464,7 +464,7 @@ namespace Hikvision.ISUPSDK
             public byte byDevAudioEnc;  //输出参数，设备的音频编码方式 0- OggVorbis，1-G711U，2-G711A，3-G726，4-AAC，5-MP2L2，6-PCM
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 62)]
             public byte[] byRes;//Reserved, set as 0. 0
-        } 
+        }
 
         [StructLayout(LayoutKind.Sequential)]
         public struct NET_EHOME_VOICE_TALK_IN
@@ -487,7 +487,7 @@ namespace Hikvision.ISUPSDK
         public struct NET_EHOME_PUSHVOICE_IN
         {
             public int dwSize;
-            public int lSessionID; 
+            public int lSessionID;
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 128)]
             public byte[] byRes;
         }
@@ -501,7 +501,7 @@ namespace Hikvision.ISUPSDK
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        public struct NET_EHOME_XML_CFG 
+        public struct NET_EHOME_XML_CFG
         {
             public IntPtr pCmdBuf;    //字符串格式命令
             public int dwCmdLen;   //pCmdBuf长度
@@ -522,29 +522,29 @@ namespace Hikvision.ISUPSDK
         {
             public int dwSize;
             public IntPtr lpInbuffer;          //input param buffer
-            public int  dwInBufferSize;      //size of input param buffer
-            public int  dwSendTimeOut;  //send time out,unit ms，default 5s
-            public int  dwRecvTimeOut;  //receive time out,unit ms，default 5s
+            public int dwInBufferSize;      //size of input param buffer
+            public int dwSendTimeOut;  //send time out,unit ms，default 5s
+            public int dwRecvTimeOut;  //receive time out,unit ms，default 5s
             public IntPtr lpOutBuffer;     //output buffer
             public int dwOutBufferSize;  //size of output buffer
             public IntPtr lpStatusBuffer;   //status buffer,if not user can set NULL
             public int dwStatusBufferSize;  //status buffer size
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
-            public byte[]byRes;
+            public byte[] byRes;
         }
 
         [StructLayout(LayoutKind.Sequential)]
         public struct NET_EHOME_PTXML_PARAM
         {
             public IntPtr pRequestUrl;
-            public int   dwRequestUrlLen;
+            public int dwRequestUrlLen;
             public IntPtr pCondBuffer;
-            public int   dwCondSize;
+            public int dwCondSize;
             public IntPtr pInBuffer;
-            public int   dwInSize;
+            public int dwInSize;
             public IntPtr pOutBuffer;
-            public int   dwOutSize;
-            public int   dwReturnedXMLLen;
+            public int dwOutSize;
+            public int dwReturnedXMLLen;
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
             public byte[] byRes;
         }
@@ -552,13 +552,13 @@ namespace Hikvision.ISUPSDK
         [StructLayout(LayoutKind.Sequential)]
         public struct NET_EHOME_REMOTE_CTRL_PARAM
         {
-            int   dwSize;
+            int dwSize;
             IntPtr lpCondBuffer;        //条件参数缓冲区
-            int   dwCondBufferSize;    //条件参数缓冲区长度
+            int dwCondBufferSize;    //条件参数缓冲区长度
             IntPtr lpInbuffer;          //控制参数缓冲区
-            int   dwInBufferSize;      //控制参数缓冲区长度
+            int dwInBufferSize;      //控制参数缓冲区长度
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
-            byte[]   byRes;
+            byte[] byRes;
         }
 
         //时间参数
@@ -591,9 +591,6 @@ namespace Hikvision.ISUPSDK
             public byte[] byRes;            //保留            
         }
 
-
-        //查询接口
-        public const int MAX_FILE_NAME_LEN = 100;
         //录像文件信息
         [StructLayout(LayoutKind.Sequential)]
         public struct NET_EHOME_REC_FILE
@@ -615,16 +612,16 @@ namespace Hikvision.ISUPSDK
 
         public struct NET_EHOME_STOPPLAYBACK_PARAM
         {
-            public int  lSessionID;
-            public int  lHandle;
+            public int lSessionID;
+            public int lHandle;
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 120)]
-            public byte[]   byRes;
+            public byte[] byRes;
         }
 
-        [StructLayout(LayoutKind.Sequential, Size=512)]
+        [StructLayout(LayoutKind.Sequential, Size = 512)]
         public struct PLAYBACK_BY_NAME
         {
-            [MarshalAs(UnmanagedType.ByValArray, SizeConst = MAX_FILE_NAME_LEN,ArraySubType = UnmanagedType.I1)]
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = MAX_FILE_NAME_LEN, ArraySubType = UnmanagedType.I1)]
             public byte[] szFileName;   //回放的文件名
             public int dwSeekType;                      //0-按字节长度计算偏移量  1-按时间（秒数）计算偏移量
             public int dwFileOffset;                    //文件偏移量，从哪个位置开始下载，如果dwSeekType为0，偏移则以字节计算，为1则以秒数计算
@@ -634,11 +631,11 @@ namespace Hikvision.ISUPSDK
                 szFileName = new byte[MAX_FILE_NAME_LEN];
                 dwSeekType = 0;
                 dwFileOffset = 0;
-                dwFileSpan = 0 ;
+                dwFileSpan = 0;
             }
         }
 
-        [StructLayout(LayoutKind.Sequential, Size=512)]
+        [StructLayout(LayoutKind.Sequential, Size = 512)]
         public struct PLAYBACK_BY_TIME
         {
             public NET_EHOME_TIME struStartTime;  // 按时间回放的开始时间
@@ -699,7 +696,7 @@ namespace Hikvision.ISUPSDK
             public byte byStreamPackage;              //回放码流类型，设备端发出的码流格式 0－PS（默认） 1－RTP
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2)]
             public byte[] byRes;
-            public PLAYBACK_BY_NAME struPlayBackbyName;            
+            public PLAYBACK_BY_NAME struPlayBackbyName;
             public NET_EHOME_IPADDRESS struStreamSever;    //流媒体地址
 
             public void Init()
@@ -742,20 +739,20 @@ namespace Hikvision.ISUPSDK
         public struct NET_EHOME_PUSHPLAYBACK_IN
         {
             public int dwSize;
-            public int lSessionID; 
-             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
+            public int lSessionID;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
             public byte[] byKeyMD5;//码流加密秘钥,两次MD5
-             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 96)]
-            public byte[]  byRes;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 96)]
+            public byte[] byRes;
         }
 
         [StructLayout(LayoutKind.Sequential)]
         public struct NET_EHOME_PUSHPLAYBACK_OUT
         {
             public int dwSize;
-            public int  lHandle;
+            public int lHandle;
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 124)]
-            public byte[]  byRes;
+            public byte[] byRes;
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -782,22 +779,22 @@ namespace Hikvision.ISUPSDK
         public const int ENUM_GET_NEXT_STATUS_NOT_SUPPORT = 1005;       //设备不支持该操作，不支持的查询类型
 
         //音对讲库错误码
-        public const int  NET_AUDIOINTERCOM_OK              =     600; //无错误
-        public const int  NET_AUDIOINTECOM_ERR_NOTSUPORT    =     601; //不支持
-        public const int  NET_AUDIOINTECOM_ERR_ALLOC_MEMERY =     602; //内存申请错误
-        public const int  NET_AUDIOINTECOM_ERR_PARAMETER    =     603; //参数错误
-        public const int  NET_AUDIOINTECOM_ERR_CALL_ORDER   =     604; //调用次序错误
-        public const int  NET_AUDIOINTECOM_ERR_FIND_DEVICE  =     605;//未发现设备
-        public const int  NET_AUDIOINTECOM_ERR_OPEN_DEVICE  =     606; //不能打开设备诶
-        public const int  NET_AUDIOINTECOM_ERR_NO_CONTEXT   =     607; //设备上下文出错
-        public const int  NET_AUDIOINTECOM_ERR_NO_WAVFILE   =     608; //WAV文件出错
-        public const int  NET_AUDIOINTECOM_ERR_INVALID_TYPE =     609; //无效的WAV参数类型
-        public const int  NET_AUDIOINTECOM_ERR_ENCODE_FAIL  =     610; //编码失败
-        public const int  NET_AUDIOINTECOM_ERR_DECODE_FAIL  =     611; //解码失败
-        public const int  NET_AUDIOINTECOM_ERR_NO_PLAYBACK  =     612; //播放失败
-        public const int  NET_AUDIOINTECOM_ERR_DENOISE_FAIL =     613; //降噪失败
-        public const int  NET_AUDIOINTECOM_ERR_UNKOWN       =     619; //未知错误
-        /*******************全局错误码 end**********************/    
+        public const int NET_AUDIOINTERCOM_OK = 600; //无错误
+        public const int NET_AUDIOINTECOM_ERR_NOTSUPORT = 601; //不支持
+        public const int NET_AUDIOINTECOM_ERR_ALLOC_MEMERY = 602; //内存申请错误
+        public const int NET_AUDIOINTECOM_ERR_PARAMETER = 603; //参数错误
+        public const int NET_AUDIOINTECOM_ERR_CALL_ORDER = 604; //调用次序错误
+        public const int NET_AUDIOINTECOM_ERR_FIND_DEVICE = 605;//未发现设备
+        public const int NET_AUDIOINTECOM_ERR_OPEN_DEVICE = 606; //不能打开设备诶
+        public const int NET_AUDIOINTECOM_ERR_NO_CONTEXT = 607; //设备上下文出错
+        public const int NET_AUDIOINTECOM_ERR_NO_WAVFILE = 608; //WAV文件出错
+        public const int NET_AUDIOINTECOM_ERR_INVALID_TYPE = 609; //无效的WAV参数类型
+        public const int NET_AUDIOINTECOM_ERR_ENCODE_FAIL = 610; //编码失败
+        public const int NET_AUDIOINTECOM_ERR_DECODE_FAIL = 611; //解码失败
+        public const int NET_AUDIOINTECOM_ERR_NO_PLAYBACK = 612; //播放失败
+        public const int NET_AUDIOINTECOM_ERR_DENOISE_FAIL = 613; //降噪失败
+        public const int NET_AUDIOINTECOM_ERR_UNKOWN = 619; //未知错误
+        /*******************全局错误码 end**********************/
 
         public const int ALARM_INFO_T = 0;
         public const int OPERATION_SUCC_T = 1;
@@ -805,9 +802,9 @@ namespace Hikvision.ISUPSDK
         public const int PLAY_SUCC_T = 3;
         public const int PLAY_FAIL_T = 4;
 
-        public const int MAX_PASSWD_LEN    =  32;
-        public const int NAME_LEN          =  32;      //用户名长度
-        public const int MAX_DEVICE_ID_LEN  =  256;     //设备ID长度
+        public const int MAX_PASSWD_LEN = 32;
+        public const int NAME_LEN = 32;      //用户名长度
+        public const int MAX_DEVICE_ID_LEN = 256;     //设备ID长度
         public const int NET_EHOME_SERIAL_LEN = 12;
         public const int MAX_MASTER_KEY_LEN = 16;
 
@@ -853,7 +850,7 @@ namespace Hikvision.ISUPSDK
             int dwHeight;     //高度
         }
         //本地配置
-        
+
         public enum NET_EHOME_LOCAL_CFG_TYPE
         {
             UNDEFINE = -1,   //暂时没有具体的定义
@@ -865,17 +862,17 @@ namespace Hikvision.ISUPSDK
         [StructLayout(LayoutKind.Sequential)]
         public struct NET_EHOME_LOCAL_ACCESS_SECURITY
         {
-            public int  dwSize;
-            public byte    byAccessSecurity;    //0-兼容模式（允许任意版本的协议接入），1-普通模式（只支持4.0以下版本，不支持协议安全的版本接入） 2-安全模式（只允许4.0以上版本，支持协议安全的版本接入）
+            public int dwSize;
+            public byte byAccessSecurity;    //0-兼容模式（允许任意版本的协议接入），1-普通模式（只支持4.0以下版本，不支持协议安全的版本接入） 2-安全模式（只允许4.0以上版本，支持协议安全的版本接入）
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 127)]
-            public byte[]  byRes;
+            public byte[] byRes;
         }
 
         [StructLayout(LayoutKind.Sequential)]
         public struct NET_EHOME_AMS_ADDRESS
         {
             public int dwSize;
-            public byte  byEnable;  //0-关闭CMS接收报警功能，1-开启CMS接收报警功能
+            public byte byEnable;  //0-关闭CMS接收报警功能，1-开启CMS接收报警功能
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
             public byte[] byRes1;
             public NET_EHOME_IPADDRESS struAddress;    //AMS本地回环地址
@@ -935,38 +932,38 @@ namespace Hikvision.ISUPSDK
             public int iLinkType;  //0-TCP , 1-UDP
             public int lHandle;
         }
-       
 
-        public const int TREE_ALL  = 0;    //device list    
+
+        public const int TREE_ALL = 0;    //device list    
         public const int DEVICE_LOGOUT = 1;   //device not log in
-        public const int DEVICE_LOGIN   = 2;   //devic3e login
+        public const int DEVICE_LOGIN = 2;   //devic3e login
         public const int DEVICE_FORTIFY = 3;   //on guard
-        public const int DEVICE_ALARM   = 4;   //alarm on device
+        public const int DEVICE_ALARM = 4;   //alarm on device
         public const int DEVICE_FORTIFY_ALARM = 5;    //onguard & alarm on device
 
-        public const int CHAN_ORIGINAL    =     6;   //no preview, no record
-        public const int CHAN_PLAY        =     7;   //preview
-        public const int CHAN_RECORD      =     8;   //record
-        public const int CHAN_PLAY_RECORD =     9;   //preview and record
+        public const int CHAN_ORIGINAL = 6;   //no preview, no record
+        public const int CHAN_PLAY = 7;   //preview
+        public const int CHAN_RECORD = 8;   //record
+        public const int CHAN_PLAY_RECORD = 9;   //preview and record
 
         //device list config
-        public const int TREE_ALL_T  = 0;        //root node
-        public const int DEVICETYPE  = 1;          //device
+        public const int TREE_ALL_T = 0;        //root node
+        public const int DEVICETYPE = 1;          //device
         public const int CHANNELTYPE = 2;          //channel    
 
         //demo 消息
         public const int WM_USER = 0x0400;
-        public const int WM_ADD_LOG  =  WM_USER + 1;    //add log 
-        public const int WM_ADD_DEV  = WM_USER + 2; //add device
+        public const int WM_ADD_LOG = WM_USER + 1;    //add log 
+        public const int WM_ADD_DEV = WM_USER + 2; //add device
         public const int WM_DEL_DEV = WM_USER + 3; //delete device
-        public const int WM_CHANGE_CHANNEL_ITEM_IMAGE  =  WM_USER + 4;     //change channel node icon
-        public const int WM_PROC_EXCEPTION  = WM_USER + 5;    //process exception
+        public const int WM_CHANGE_CHANNEL_ITEM_IMAGE = WM_USER + 4;     //change channel node icon
+        public const int WM_PROC_EXCEPTION = WM_USER + 5;    //process exception
         public const int WM_CHANGE_IP = WM_USER + 6; //ip address changed
 
         public enum DEMO_CHANNEL_TYPE
         {
             DEMO_CHANNEL_TYPE_INVALID = -1,
-            DEMO_CHANNEL_TYPE_ANALOG  = 0,
+            DEMO_CHANNEL_TYPE_ANALOG = 0,
             DEMO_CHANNEL_TYPE_IP = 1,
             DEMO_CHANNEL_TYPE_ZERO //零通道
         };
@@ -989,16 +986,16 @@ namespace Hikvision.ISUPSDK
             public bool bPlay;
             public void Init()
             {
-                iDeviceIndex        = -1;
-                iChanIndex          = -1;
-                iSessionID          = -1;
-                dwStreamType        = 0;
-                dwLinkMode          = 0;
-                lPreviewHandle      = -1;
-                iChannelNO          = -1;
-                bEnable             = false;
-                iChanType           = DEMO_CHANNEL_TYPE.DEMO_CHANNEL_TYPE_INVALID;
-                dwImageType         = CHAN_ORIGINAL;
+                iDeviceIndex = -1;
+                iChanIndex = -1;
+                iSessionID = -1;
+                dwStreamType = 0;
+                dwLinkMode = 0;
+                lPreviewHandle = -1;
+                iChannelNO = -1;
+                bEnable = false;
+                iChanType = DEMO_CHANNEL_TYPE.DEMO_CHANNEL_TYPE_INVALID;
+                dwImageType = CHAN_ORIGINAL;
                 struIP.szIP = new byte[128];
                 struIP.byRes = new byte[32];
                 struIP.wPort = 8000;
@@ -1035,9 +1032,9 @@ namespace Hikvision.ISUPSDK
             public int dwIPChanNum;              //IP channel number
             public int dwZeroChanNum;            //零通道个数
             public int dwZeroChanStart;          //零通道起始个数
-            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 12, ArraySubType =UnmanagedType.U1)]
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 12, ArraySubType = UnmanagedType.U1)]
             public byte[] sDeviceSerial;    //设备序列号，数字序列号
-            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 8, ArraySubType =UnmanagedType.U1)]
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 8, ArraySubType = UnmanagedType.U1)]
             public byte[] sIdentifyCode;    //设备验证码，出厂时，设备固件中写入的随机码。默认为abcdef
             public bool bPlayDevice;
             public int dwVersion;
@@ -1052,8 +1049,8 @@ namespace Hikvision.ISUPSDK
             public void Init()
             {
                 iDeviceIndex = -1;
-                iLoginID = -1; 
-                byDeviceID = new byte[256];   
+                iLoginID = -1;
+                byDeviceID = new byte[256];
                 byPassword = new byte[32];
                 byFirmwareVersion = new byte[64];
                 byDevLocalIP = new byte[128];
@@ -1082,78 +1079,189 @@ namespace Hikvision.ISUPSDK
             }
         }
 
-        public string convEncode(string write, string fromEncode, string toEncode)
+        [StructLayout(LayoutKind.Sequential)]
+        public struct NET_EHOME_NEWLINK_CB_MSG
         {
+            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = MAX_DEVICE_ID_LEN)]
+            public byte[] szDeviceID;   //设备标示符    
+            public long iSessionID;     //设备分配给该取流会话的ID
+            public long dwChannelNo;    //设备通道号
+            public byte byStreamType;   //0-主码流，1-子码流
+            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 3)]
+            public byte[] byRes1;
+            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = NET_EHOME_SERIAL_LEN)]
+            public byte[] sDeviceSerial;    //设备序列号，数字序列号
+            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 112)]
+            public byte[] byRes;
+            public void Init()
+            {
+                szDeviceID = new byte[MAX_DEVICE_ID_LEN];
+                byRes1 = new byte[3];
+                sDeviceSerial = new byte[NET_EHOME_SERIAL_LEN];
+                byRes = new byte[112];
+            }
 
-            //声明字符集
-
-            Encoding From, To;
-
-            From = Encoding.GetEncoding(fromEncode);
-
-            To = Encoding.GetEncoding(toEncode);
-
-            byte[] temp = From.GetBytes(write);
-
-            byte[] temp1 = Encoding.Convert(From, To, temp);
-
-            //返回转换后的字符   
-
-            return To.GetString(temp1);
         }
 
-        private NET_EHOME_PTXML_PARAM struPTXML = new NET_EHOME_PTXML_PARAM();
-        string m_strInputXml;
-        string m_strOutputXml;
-        private byte[] m_szInputBuffer = new byte[1500];
-        private byte[] m_szOutBuffer = new byte[1024 * 10];
-        private byte[] m_szUrl = new byte[1024];
-        private int m_iDeviceIndex;
+        public delegate bool PREVIEW_NEWLINK_CB(int lLinkHandle, ref NET_EHOME_NEWLINK_CB_MSG pNewLinkCBMsg, IntPtr pUserData);
 
-        public void ConfigMethod(ref IntPtr ptrCfg, string strTemp, string m_strInputXml, int OutBufferLen)
+        [StructLayout(LayoutKind.Sequential)]
+        public struct NET_EHOME_LISTEN_PREVIEW_CFG
         {
-            byte[] m_szInputBuffer = new byte[strTemp.Length];
-            m_szUrl = Encoding.Default.GetBytes(strTemp);
-            struPTXML.pRequestUrl = Marshal.AllocHGlobal(300);
-            Marshal.Copy(m_szUrl, 0, struPTXML.pRequestUrl, m_szUrl.Length);
-            struPTXML.dwRequestUrlLen = (int)m_szUrl.Length;
-            strTemp = m_strInputXml;
-            if ("" == strTemp)
-            {
-                struPTXML.pInBuffer = IntPtr.Zero;
-                struPTXML.dwInSize = 0;
-            }
-            else
-            {
-                m_szInputBuffer = Encoding.UTF8.GetBytes(strTemp);
-                struPTXML.pInBuffer = Marshal.AllocHGlobal(strTemp.Length);
-                Marshal.Copy(m_szInputBuffer, 0, struPTXML.pInBuffer, m_szInputBuffer.Length);
-                struPTXML.dwInSize = (int)m_szInputBuffer.Length;
-            }
-            struPTXML.pOutBuffer = Marshal.AllocHGlobal(OutBufferLen);
-            for (int i = 0; i < OutBufferLen; i++)
-            {
-                Marshal.WriteByte(struPTXML.pOutBuffer, i, 0);
-            }
-            struPTXML.dwOutSize = (int)OutBufferLen;
-            struPTXML.byRes = new byte[32];
-            try
-            {
-                ptrCfg = Marshal.AllocHGlobal(Marshal.SizeOf(struPTXML));
-                Marshal.StructureToPtr(struPTXML, ptrCfg, false);
-            }
-            catch (ArgumentException)
-            {
-                Marshal.FreeHGlobal(struPTXML.pRequestUrl);
-                Marshal.FreeHGlobal(struPTXML.pInBuffer);
-                Marshal.FreeHGlobal(struPTXML.pOutBuffer);
-                Marshal.FreeHGlobal(ptrCfg);
-                return;
-            }
+            public NET_EHOME_IPADDRESS struIPAdress; //本地监听信息，IP为0.0.0.0的情况下，默认为本地地址，多个网卡的情况下，默认为从操作系统获取到的第一个
+            public PREVIEW_NEWLINK_CB fnNewLinkCB; //预览请求回调函数，当收到预览连接请求后，SDK会回调该回调函数。
+            public IntPtr pUser;        // 用户参数，在fnNewLinkCB中返回出来
+            public byte byLinkMode;   //0：TCP，1：UDP 2: HRUDP方式
+            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 127)]
+            public byte[] byRes;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct NET_EHOME_PREVIEW_CB_MSG
+        {
+            public byte byDataType;
+            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 3)]
+            public byte[] byRes1;
+            public IntPtr pRecvdata;      //码流头或者数据
+            public int dwDataLen;      //数据长度
+            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 128)]
+            public byte[] byRes2;
+        }
+        public delegate void PREVIEW_DATA_CB(int iPreviewHandle, ref NET_EHOME_PREVIEW_CB_MSG pPreviewCBMsg, IntPtr pUserData);
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct NET_EHOME_PREVIEW_DATA_CB_PARAM
+        {
+            public PREVIEW_DATA_CB fnPreviewDataCB;    //数据回调函数
+            public IntPtr pUserData;          //用户参数, 在fnPreviewDataCB回调出来
+            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 128)]
+            public byte[] byRes;                   //保留
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct NET_EHOME_PLAYBACK_NEWLINK_CB_INFO
+        {
+            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = MAX_DEVICE_ID_LEN)]
+            public byte[] szDeviceID;   //设备标示符
+            public Int32 lSessionID;     //设备分配给该回放会话的ID，0表示无效
+            public Int32 dwChannelNo;    //设备通道号，0表示无效
+            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = NET_EHOME_SERIAL_LEN)]
+            public byte[] sDeviceSerial;	/*12*///设备序列号，数字序列号
+            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 108)]
+            public byte[] byRes;
         }
 
 
+        public delegate bool PLAYBACK_NEWLINK_CB(Int32 lPlayBackLinkHandle, ref NET_EHOME_PLAYBACK_NEWLINK_CB_INFO pNewLinkCBInfo, IntPtr pUserData);
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct NET_EHOME_PLAYBACK_LISTEN_PARAM
+        {
+            public NET_EHOME_IPADDRESS struIPAdress;   //本地监听信息，IP为0.0.0.0的情况下，默认为本地地址，
+            //多个网卡的情况下，默认为从操作系统获取到的第一个
+            public PLAYBACK_NEWLINK_CB fnNewLinkCB;    //回放新连接回调函数
+            public IntPtr pUserData;        //用户参数，在fnNewLinkCB中返回出来
+            public byte byLinkMode;     //0：TCP，1：UDP (UDP保留)
+            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 127)]
+            public byte[] byRes;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct NET_EHOME_PLAYBACK_DATA_CB_INFO
+        {
+            public Int32 dwType;                    //类型 0-头信息 1-码流数据
+            public IntPtr pData;                    //数据指针
+            public Int32 dwDataLen;                //数据长度
+            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 128)]
+            public byte[] byRes;                //保留
+        }
 
 
-  }
+        public delegate bool PLAYBACK_DATA_CB(Int32 iPlayBackLinkHandle, ref NET_EHOME_PLAYBACK_DATA_CB_INFO pDataCBInfo, IntPtr pUserData);
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct NET_EHOME_PLAYBACK_DATA_CB_PARAM
+        {
+            public PLAYBACK_DATA_CB fnPlayBackDataCB;        //数据回调函数
+            public IntPtr pUserData;               //用户参数, 在fnPlayBackDataCB回调出来
+            public byte byStreamFormat;          //码流封装格式：0-PS 1-RTP 
+            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 127)]
+            public byte[] byRes;                   //保留
+        }
+
+        public const int EHOME_PREVIEW_EXCEPTION = 0x102;     //预览取流异常
+        public const int EHOME_PLAYBACK_EXCEPTION = 0x103;    //回放取流异常
+        public const int EHOME_AUDIOTALK_EXCEPTION = 0x104;   //语音对讲取流异常
+        public const int NET_EHOME_DEVICEID_LEN = 256;     //设备ID长度
+        public const int MAX_FILE_NAME_LEN = 100;
+
+
+        public const int NET_EHOME_SYSHEAD = 1;     //系统头数据 
+        public const int NET_EHOME_STREAMDATA = 2;      //视频流数据
+        public const int NET_EHOME_STREAMEND = 3;      //视频流结束标记
+
+        //------------------------------------------------------------------------------------------------------------
+        //语音对讲
+        [StructLayout(LayoutKind.Sequential)]
+        public struct NET_EHOME_VOICETALK_NEWLINK_CB_INFO
+        {
+            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = NET_EHOME_DEVICEID_LEN)]
+            public byte[] szDeviceID; /*256*/      //设备标示符    
+            public Int32 dwEncodeType;            //SDK赋值,当前对讲设备的语音编码类型,0- OggVorbis，1-G711U，2-G711A，3-G726，4-AAC，5-MP2L2，6-PCM
+            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = NET_EHOME_SERIAL_LEN)]
+            public char[] sDeviceSerial;/*12*/     //设备序列号，数字序列号
+            public Int32 dwAudioChan; //对讲通道
+            public Int32 lSessionID;     //设备分配给该回放会话的ID，0表示无效
+            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 128)]
+            public byte[] byRes;
+        }
+
+
+        public delegate bool VOICETALK_NEWLINK_CB(Int32 lHandle, ref NET_EHOME_VOICETALK_NEWLINK_CB_INFO pNewLinkCBInfo, IntPtr pUserData);
+
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct NET_EHOME_LISTEN_VOICETALK_CFG
+        {
+            public NET_EHOME_IPADDRESS struIPAdress;   //本地监听信息，IP为0.0.0.0的情况下，默认为本地地址，
+            //多个网卡的情况下，默认为从操作系统获取到的第一个
+            public VOICETALK_NEWLINK_CB fnNewLinkCB;    //新连接回调函数
+            public IntPtr pUser;        //用户参数，在fnNewLinkCB中返回出来
+            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 128)]
+            public byte[] byRes;
+        }
+
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct NET_EHOME_VOICETALK_DATA_CB_INFO
+        {
+            public byte[] pData;               //数据指针
+            public Int32 dwDataLen;            //数据长度
+            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 128)]
+            public byte[] byRes;                //保留
+        }
+
+        public delegate bool VOICETALK_DATA_CB(Int32 lHandle, ref NET_EHOME_VOICETALK_DATA_CB_INFO pDataCBInfo, IntPtr pUserData);
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct NET_EHOME_VOICETALK_DATA_CB_PARAM
+        {
+            public VOICETALK_DATA_CB fnVoiceTalkDataCB;    //数据回调函数
+            public IntPtr pUserData;         //用户参数, 在fnVoiceTalkDataCB回调出来
+            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 128)]
+            public byte[] byRes;          //保留
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct NET_EHOME_VOICETALK_DATA
+        {
+            public byte[] pSendBuf;            //音频数据缓冲区
+            public uint dwDataLen;            //音频数据长度
+            [MarshalAsAttribute(UnmanagedType.ByValArray, SizeConst = 128)]
+            public byte[] byRes;            //保留
+        }
+
+        public delegate void fExceptionCallBack(int dwType, int iUserID, int iHandle, IntPtr pUser);
+
+    }
 }

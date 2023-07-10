@@ -7,6 +7,7 @@ namespace Hikvision.ISUPSDK
     internal class Methods_Win
     {
         public const string DllPath = "HCISUPCMS.dll";
+        public const string StreamDllPath = "HCISUPStream.dll";
 
         [DllImport(DllPath)]
         public static extern bool NET_ECMS_Init();
@@ -94,5 +95,48 @@ namespace Hikvision.ISUPSDK
         public static extern bool NET_ECMS_DeletePTXMLConfig(Int32 lUserID, IntPtr lpPTXMLParam);
         [DllImport(DllPath)]
         public static extern bool NET_ECMS_ISAPIPassThrough(Int32 lUserID, IntPtr lpParam);
+
+        [DllImport(StreamDllPath)]
+        public static extern bool NET_ESTREAM_Init();
+        [DllImport(StreamDllPath)]
+        public static extern bool NET_ESTREAM_Fini();
+        [DllImport(StreamDllPath)]
+        public static extern bool NET_ESTREAM_GetLastError();
+        [DllImport(StreamDllPath)]
+        public static extern bool NET_ESTREAM_SetExceptionCallBack(Int32 dwMessage, Int32 hWnd, fExceptionCallBack fExCB, IntPtr pUser);
+        [DllImport(StreamDllPath)]
+        public static extern bool NET_ESTREAM_SetLogToFile(Int32 iLogLevel, String strLogDir, bool bAutoDel);
+        [DllImport(StreamDllPath)]
+        public static extern bool NET_ESTREAM_GetBuildVersion();
+        [DllImport(StreamDllPath)]
+        public static extern Int32 NET_ESTREAM_StartListenPreview(ref NET_EHOME_LISTEN_PREVIEW_CFG pListenParam);//ref NET_EHOME_LISTEN_PREVIEW_CFG pListenParam
+        [DllImport(StreamDllPath)]
+        public static extern bool NET_ESTREAM_StopListenPreview(Int32 iListenHandle);
+        [DllImport(StreamDllPath)]
+        public static extern bool NET_ESTREAM_StopPreview(Int32 iPreviewHandle);
+        [DllImport(StreamDllPath)]
+        public static extern bool NET_ESTREAM_SetPreviewDataCB(Int32 iHandle, IntPtr pStruCBParam);
+        [DllImport(StreamDllPath)]
+        public static extern Int32 NET_ESTREAM_StartListenVoiceTalk(ref NET_EHOME_LISTEN_VOICETALK_CFG pListenParam);
+        [DllImport(StreamDllPath)]
+        public static extern bool NET_ESTREAM_StopListenVoiceTalk(Int32 lListenHandle);
+        [DllImport(StreamDllPath)]
+        public static extern bool NET_ESTREAM_SetVoiceTalkDataCB(Int32 lHandle, ref NET_EHOME_VOICETALK_DATA_CB_PARAM pStruCBParam);
+        [DllImport(StreamDllPath)]
+        public static extern int NET_ESTREAM_SendVoiceTalkData(Int32 lHandle, ref NET_EHOME_VOICETALK_DATA pVoicTalkData);
+        [DllImport(StreamDllPath)]
+        public static extern bool NET_ESTREAM_StopVoiceTalk(Int32 lHandle);
+        [DllImport(StreamDllPath)]
+        public static extern Int32 NET_ESTREAM_StartListenPlayBack(ref NET_EHOME_PLAYBACK_LISTEN_PARAM pListenParam);
+        [DllImport(StreamDllPath)]
+        public static extern bool NET_ESTREAM_SetPlayBackDataCB(Int32 iPlayBackLinkHandle, IntPtr ptrDataCBParam);
+        [DllImport(StreamDllPath)]
+        public static extern bool NET_ESTREAM_StopPlayBack(Int32 iPlayBackLinkHandle);
+        [DllImport(StreamDllPath)]
+        public static extern bool NET_ESTREAM_StopListenPlayBack(Int32 iPlaybackListenHandle);
+        [DllImport(StreamDllPath)]
+        public static extern bool NET_ESTREAM_SetSDKLocalCfg(NET_EHOME_LOCAL_CFG_TYPE enumType, IntPtr lpInBuff);
+        [DllImport(StreamDllPath)]
+        public static extern bool NET_ESTREAM_GetSDKLocalCfg(NET_EHOME_LOCAL_CFG_TYPE enumType, IntPtr lpOutBuff);
     }
 }
