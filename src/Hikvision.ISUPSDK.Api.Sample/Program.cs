@@ -1,8 +1,14 @@
 ﻿using Hikvision.ISUPSDK.Api;
+using Hikvision.ISUPSDK.Api.Sample;
 using Hikvision.ISUPSDK.Api.Utils;
 using Newtonsoft.Json;
+using System.Net.Sockets;
 
+var zlmServerIpAddress = "127.0.0.1";
+var zlmServerRtpPort = 10000;
 var smsServerIpAddrss = "127.0.0.1";
+
+UdpClient zlmClient = new UdpClient(zlmServerIpAddress, zlmServerRtpPort);
 
 CmsContext.Init();
 SmsContext.Init();
@@ -15,7 +21,7 @@ var cmsOptions = new CmsContextOptions()
 var smsOptions = new SmsContextOptions()
 {
     ListenIPAddress = "0.0.0.0",
-    ListenPort = 7661,
+    ListenPort = 7760,
     LinkMode = SmsLinkMode.TCP
 };
 
@@ -36,17 +42,57 @@ void SmsContext_PreviewNewlink(object? sender, SmsContextPreviewNewlinkEventArgs
     Console.WriteLine($"[SMS]MediaId:{mediaId},SSRC:{ssrc},StreamId:{streamId}");
 }
 
+
+
 void SmsContext_PreviewData(object? sender, SmsContextPreviewDataEventArgs e)
 {
     if (e.DataType == SmsContextPreviewDataType.NET_DVR_SYSHEAD)
         return;
-    var span = e.GetDataSpan();
-    Console.Write("[SMS]新数据：");
-    foreach (var b in span)
+
+    var buffer = new byte[1400];
+    var dataSpan = e.GetDataSpan();
+
+    
+    while (dataSpan.Length > 0)
     {
-        Console.Write(b.ToString("X2"));
+        var ms = new MemoryStream(buffer);
+        ms.Write(new byte[] { 0x80, 0x60 });
+
+        //SequenceNumber
+        var sequenceNumberBuffer = BitConverter.GetBytes(Global.SequenceNumber);
+        Global.SequenceNumber++;
+        if (BitConverter.IsLittleEndian)
+            Array.Reverse(sequenceNumberBuffer);
+        ms.Write(sequenceNumberBuffer);
+        //Time
+        byte[] timeSpanBuffer = BitConverter.GetBytes(Convert.ToUInt32((DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds));
+        if (BitConverter.IsLittleEndian)
+            Array.Reverse(timeSpanBuffer);
+        ms.Write(timeSpanBuffer);
+        //SSRC
+        ms.Write(new byte[] { 0x12, 0x34, 0x56, 0x78 });
+        //Payload
+        var takeCount = buffer.Length - Convert.ToInt32(ms.Position);
+        takeCount = Math.Min(takeCount, dataSpan.Length);
+        var currentDataSpan = dataSpan.Slice(0, takeCount);
+        dataSpan = dataSpan.Slice(takeCount);
+        ms.Write(currentDataSpan);
+
+        var spanLength = Convert.ToInt32(ms.Length);
+        ms.Close();
+        ms.Dispose();
+        var span = new ReadOnlySpan<byte>(buffer, 0, spanLength);
+        zlmClient.Send(span);
+        Console.WriteLine("[SMS]新数据：" + span.ToString());
+        //Console.Write($"[SMS]转发数据[{span.Length}字节]：");
+        //foreach (var b in span)
+        //{
+        //    Console.Write(b.ToString("X2"));
+        //}
+        //Console.WriteLine();
+        Global.SequenceNumber++;
     }
-    Console.WriteLine();
+    //smsContext.PreviewData -= SmsContext_PreviewData;
 }
 
 void Context_DeviceOffline(object? sender, DeviceContext e)
