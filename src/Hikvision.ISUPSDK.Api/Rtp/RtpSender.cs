@@ -19,6 +19,13 @@ namespace Hikvision.ISUPSDK.Api
         private ushort seq = 0;
         private int payloadOffset = 0;
         private int contentLeftLength = 0;
+        private ReadState currentReadState = ReadState.ReadHeader;
+        private enum ReadState
+        {
+            ReadHeader,
+            ReadLength,
+            ReadPayload
+        }
 
         public RtpSender(RtpSenderOptions options)
         {
@@ -35,6 +42,7 @@ namespace Hikvision.ISUPSDK.Api
                 ssrcSpan.Reverse();
         }
         private IPEndPoint remoteEndPoint;
+
         public void Connect()
         {
             udpClient = new UdpClient();
@@ -48,10 +56,9 @@ namespace Hikvision.ISUPSDK.Api
             BitConverter.TryWriteBytes(seqSpan, seq);
             if (BitConverter.IsLittleEndian)
                 seqSpan.Reverse();
-            Console.WriteLine($"[{seq}]RTP包： " + data.Length);
-
             //发送包
             udpClient.Send(data, remoteEndPoint);
+
             payloadOffset = 0;
             seq++;
             if (seq == ushort.MaxValue)
@@ -63,78 +70,93 @@ namespace Hikvision.ISUPSDK.Api
             var allSpan = new Span<byte>(buffer);
             while (data.Length > 0)
             {
-                var paylaodSpan = allSpan.Slice(RTP_HEAD_LENGTH + payloadOffset);
                 //如果缓冲区满了，发送一次数据
                 if (payloadOffset >= RTP_PAYLOAD_LENGTH)
                 {
                     var sendSpan = allSpan.Slice(0, RTP_HEAD_LENGTH + payloadOffset);
                     sendRtpPackage(sendSpan);
                 }
-                //如果内容还没有读取完
-                if (contentLeftLength > 0)
+                var paylaodSpan = allSpan.Slice(RTP_HEAD_LENGTH + payloadOffset);
+                switch (currentReadState)
                 {
-                    var copyLength = Math.Min(Math.Min(paylaodSpan.Length, contentLeftLength), data.Length);
-                    if (copyLength <= 0)
-                        continue;
-                    data.Slice(0, copyLength).CopyTo(paylaodSpan);
-                    data = data.Slice(copyLength);
-                    payloadOffset += copyLength;
-                    contentLeftLength -= copyLength;
-                }
-                else
-                {
-                    var head = data.Slice(0, PS_ANY_HEAD_LENGTH);
-                    data = data.Slice(PS_ANY_HEAD_LENGTH);
-                    //如果是PS头
-                    if (head.SequenceEqual(PsHeaders.PsStartHeader))
-                    {
-                        if (payloadOffset > 0)
+                    case ReadState.ReadHeader:
                         {
-                            sendRtpPackage(allSpan.Slice(0, RTP_HEAD_LENGTH + payloadOffset));
+                            var head = data.Slice(0, PS_ANY_HEAD_LENGTH);
+                            data = data.Slice(PS_ANY_HEAD_LENGTH);
+                            //如果是PS头
+                            if (head.SequenceEqual(PsHeaders.PsStartHeader))
+                            {
+                                if (payloadOffset > 0)
+                                {
+                                    sendRtpPackage(allSpan.Slice(0, RTP_HEAD_LENGTH + payloadOffset));
+                                }
+                                paylaodSpan = allSpan.Slice(RTP_HEAD_LENGTH + payloadOffset);
+                                head.CopyTo(paylaodSpan);
+                                paylaodSpan = paylaodSpan.Slice(head.Length);
+                                payloadOffset += head.Length;
+                                //PS头后还有10字节
+                                var psHead = data.Slice(0, 10);
+                                data = data.Slice(10);
+                                psHead.CopyTo(paylaodSpan);
+                                payloadOffset += psHead.Length;
+                                //后面还有几个扩展字节
+                                var extendByteLength = psHead[9] & 0x07;
+                                contentLeftLength = extendByteLength;
+                                currentReadState = ReadState.ReadPayload;
+                            }
+                            //否则是其他类型包
+                            else if (
+                                head.SequenceEqual(PsHeaders.PsSystemHeader)
+                                || head.SequenceEqual(PsHeaders.PsSystemMap)
+                                || head.SequenceEqual(PsHeaders.PesHeader_Video)
+                                || head.SequenceEqual(PsHeaders.PsPrivateData)
+                                )
+                            {
+                                head.CopyTo(paylaodSpan);
+                                payloadOffset += head.Length;
+                                currentReadState = ReadState.ReadLength;
+                            }
+                            else
+                            {
+                                payloadOffset = 0;
+                                contentLeftLength = 0;
+                                return;
+                            }
+                            break;
                         }
-                        paylaodSpan = allSpan.Slice(RTP_HEAD_LENGTH + payloadOffset);
-                        head.CopyTo(paylaodSpan);
-                        paylaodSpan = paylaodSpan.Slice(head.Length);
-                        payloadOffset += head.Length;
-                        //PS头后还有10字节
-                        var psHead = data.Slice(0, 10);
-                        data = data.Slice(10);
-                        psHead.CopyTo(paylaodSpan);
-                        payloadOffset += psHead.Length;
-                        //后面还有几个扩展字节
-                        var extendByteLength = psHead[9] & 0x07;
-                        contentLeftLength = extendByteLength;
-                    }
-                    //否则是其他类型包
-                    else if (
-                        head.SequenceEqual(PsHeaders.PsSystemHeader)
-                        || head.SequenceEqual(PsHeaders.PsSystemMap)
-                        || head.SequenceEqual(PsHeaders.PesHeader_Video)
-                        || head.SequenceEqual(PsHeaders.PsPrivateData)
-                        )
-                    {
-                        head.CopyTo(paylaodSpan);
-                        paylaodSpan = paylaodSpan.Slice(head.Length);
-                        payloadOffset += head.Length;
-                        //读取长度
-                        var lengthSpan = data.Slice(0, PS_ANY_HEAD_LENGTH_LENGTH);
-                        lengthSpan.CopyTo(paylaodSpan);
-                        if (BitConverter.IsLittleEndian)
-                            lengthSpan.Reverse();
-                        contentLeftLength = BitConverter.ToUInt16(lengthSpan);
-                        if (BitConverter.IsLittleEndian)
-                            lengthSpan.Reverse();
-                        data = data.Slice(lengthSpan.Length);
-                        paylaodSpan = paylaodSpan.Slice(lengthSpan.Length);
-                        lengthSpan.CopyTo(paylaodSpan);
-                        payloadOffset += lengthSpan.Length;
-                    }
-                    else
-                    {
-                        payloadOffset = 0;
-                        contentLeftLength = 0;
-                        return;
-                    }
+                    case ReadState.ReadLength:
+                        {
+                            //读取长度
+                            var lengthSpan = data.Slice(0, PS_ANY_HEAD_LENGTH_LENGTH);
+                            lengthSpan.CopyTo(paylaodSpan);
+                            if (BitConverter.IsLittleEndian)
+                                lengthSpan.Reverse();
+                            contentLeftLength = BitConverter.ToUInt16(lengthSpan);
+                            if (BitConverter.IsLittleEndian)
+                                lengthSpan.Reverse();
+                            data = data.Slice(lengthSpan.Length);
+                            paylaodSpan = paylaodSpan.Slice(lengthSpan.Length);
+                            lengthSpan.CopyTo(paylaodSpan);
+                            payloadOffset += lengthSpan.Length;
+                            currentReadState = ReadState.ReadPayload;
+                            break;
+                        }
+                    case ReadState.ReadPayload:
+                        {
+                            var copyLength = Math.Min(Math.Min(paylaodSpan.Length, contentLeftLength), data.Length);
+                            if (copyLength <= 0)
+                            {
+                                currentReadState = ReadState.ReadHeader;
+                                continue;
+                            }
+                            data.Slice(0, copyLength).CopyTo(paylaodSpan);
+                            data = data.Slice(copyLength);
+                            payloadOffset += copyLength;
+                            contentLeftLength -= copyLength;
+                            if (contentLeftLength <= 0)
+                                currentReadState = ReadState.ReadHeader;
+                            break;
+                        }
                 }
             }
         }
