@@ -1,5 +1,6 @@
 ﻿using Hikvision.ISUPSDK.Api.Rtp;
 using System;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 
@@ -13,9 +14,9 @@ namespace Hikvision.ISUPSDK.Api
         public UdpRtpSender(RtpSenderOptions options)
             : base(options)
         {
-            remoteEndPoint = new IPEndPoint(IPAddress.Parse(options.Host), options.Port);
+            var ipAddress = Dns.GetHostAddresses(options.Host).FirstOrDefault();
+            remoteEndPoint = new IPEndPoint(ipAddress, options.Port);
         }
-
 
         public override void Connect()
         {

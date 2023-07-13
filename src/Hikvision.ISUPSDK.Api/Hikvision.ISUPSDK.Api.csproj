@@ -9,7 +9,7 @@
 		<RepositoryType>git</RepositoryType>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<Description>Hikvision.ISUPSDK二次开发API</Description>
-		<Version>2.5.0.35-preview4</Version>
+		<Version>2.5.0.35-preview5</Version>
 		<PackageIcon>logo.png</PackageIcon>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
