@@ -44,6 +44,7 @@ namespace Hikvision.ISUPSDK
         public const int NET_EHOME_SET_PIC_CFG = 23; //设置OSD显示参数
         public const int MAX_EHOME_PROTOCOL_LEN = 1500;
         public const int IPADDRESS_LENGTH = 128;//IP地址数组的长度
+        public const int NET_EHOME_PTZ_CTRL = 1000; //云台控制
 
         public const string CONFIG_GET_PARAM_XML = "<Params>\r\n<ConfigCmd>{0}</ConfigCmd>\r\n<ConfigParam1>{1}</ConfigParam1>\r\n<ConfigParam2>{2}</ConfigParam2>\r\n<ConfigParam3>{3}</ConfigParam3>\r\n<ConfigParam4>{4}</ConfigParam4>\r\n</Params>\r\n";
         public const string CONFIG_SET_PARAM_XML = "<Params>\r\n<ConfigCmd>{0}</ConfigCmd>\r\n<ConfigParam1>{1}</ConfigParam1>\r\n<ConfigParam2>{2}</ConfigParam2>\r\n<ConfigParam3>{3}</ConfigParam3>\r\n<ConfigParam4>{4}</ConfigParam4>\r\n<ConfigXML>{5}</ConfigXML>\r\n</Params>\r\n";
@@ -552,13 +553,26 @@ namespace Hikvision.ISUPSDK
         [StructLayout(LayoutKind.Sequential)]
         public struct NET_EHOME_REMOTE_CTRL_PARAM
         {
-            int dwSize;
-            IntPtr lpCondBuffer;        //条件参数缓冲区
-            int dwCondBufferSize;    //条件参数缓冲区长度
-            IntPtr lpInbuffer;          //控制参数缓冲区
-            int dwInBufferSize;      //控制参数缓冲区长度
+            public int dwSize;
+            public IntPtr lpCondBuffer;        //条件参数缓冲区
+            public int dwCondBufferSize;    //条件参数缓冲区长度
+            public IntPtr lpInbuffer;          //控制参数缓冲区
+            public int dwInBufferSize;      //控制参数缓冲区长度
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
-            byte[] byRes;
+            public byte[] byRes;
+
+            public void Init()
+            {
+                byRes = new byte[32];
+                dwSize = Marshal.SizeOf(this);
+            }
+
+            public static NET_EHOME_REMOTE_CTRL_PARAM NewInstance()
+            {
+                var item = new NET_EHOME_REMOTE_CTRL_PARAM();
+                item.Init();
+                return item;
+            }
         }
 
         //时间参数
@@ -1288,5 +1302,28 @@ namespace Hikvision.ISUPSDK
 
         public delegate void fExceptionCallBack(int dwType, int iUserID, int iHandle, IntPtr pUser);
 
+        [StructLayout(LayoutKind.Sequential)]
+        public struct NET_EHOME_PTZ_PARAM
+        {
+            public int dwSize;                  //结构体大小
+            public byte byPTZCmd;               //PTZ 控制命令
+            public byte byAction;               //PTZ 控制：0-开始，1-停止。
+            public byte bySpeed;                //PTZ 速度，取值范围从 0 到 70。值越大，代表速度越快。
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 29)]
+            public byte[] byRes;                //保留
+
+            public void Init()
+            {
+                byRes = new byte[29];
+                dwSize = Marshal.SizeOf(this);
+            }
+
+            public static NET_EHOME_PTZ_PARAM NewInstance()
+            {
+                var item = new NET_EHOME_PTZ_PARAM();
+                item.Init();
+                return item;
+            }
+        }
     }
 }

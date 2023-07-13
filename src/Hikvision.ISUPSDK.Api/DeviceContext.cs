@@ -221,31 +221,80 @@ namespace Hikvision.ISUPSDK.Api
             RefreshChannels();
         }
 
-        public void StartPushStream(int channelId, string smsIPAddress, int smsPort)
+        /// <summary>
+        /// 开始获取预览流
+        /// </summary>
+        /// <param name="channelId"></param>
+        /// <param name="smsIPAddress"></param>
+        /// <param name="smsPort"></param>
+        /// <returns></returns>
+        public int StartGetRealStreamV11(
+            string smsIPAddress, int smsPort,
+            int channelId,
+            SmsLinkMode linkMode, SmsStreamType streamType)
         {
             //预览请求的输入参数
             var struPreviewIn = NET_EHOME_PREVIEWINFO_IN_V11.NewInstance();
             struPreviewIn.iChannel = channelId; //通道号
-            struPreviewIn.dwLinkMode = 0; //0-TCP, 1-UDP 
-            struPreviewIn.dwStreamType = 1; //码流类型：0-主码流，1-子码流 2-第三码流
+            struPreviewIn.dwLinkMode = (byte)linkMode;
+            struPreviewIn.dwStreamType = (byte)streamType;
             StringUtils.String2ByteArray(smsIPAddress, struPreviewIn.struStreamSever.szIP);
             struPreviewIn.struStreamSever.wPort = (short)smsPort; //SMS 的端口号，需和监听端口号一致
                                                                   //预览请求的输出参数
             var struPreviewOut = NET_EHOME_PREVIEWINFO_OUT.NewInstance();
             //预览请求
             Invoke(NET_ECMS_StartGetRealStreamV11(LoginID, ref struPreviewIn, ref struPreviewOut));
-            var mediaId = struPreviewOut.lSessionID;
-            var ssrc = MediaStreamUtils.GetSSRC(mediaId);
-            var streamId = MediaStreamUtils.GetStreamId(ssrc);
-            Console.WriteLine($"MediaId:{mediaId},SSRC:{ssrc},StreamId:{streamId}");
+            return struPreviewOut.lSessionID;
+        }
 
+        /// <summary>
+        /// 开始推送预览流
+        /// </summary>
+        /// <param name="streamId"></param>
+        public void StartPushRealStream(int streamId)
+        {
             //码流传输请求的输入参数
             var struPushStreamIn = NET_EHOME_PUSHSTREAM_IN.NewInstance();
-            struPushStreamIn.lSessionID = struPreviewOut.lSessionID; //预览请求的会话 ID
-                                                                     //码流传输请求的输出参数
+            struPushStreamIn.lSessionID = streamId; //预览请求的会话 ID
+                                                    //码流传输请求的输出参数
             var struPushStreamOut = NET_EHOME_PUSHSTREAM_OUT.NewInstance();
             //发送请求给设备并开始传输实时码流
             Invoke(NET_ECMS_StartPushRealStream(LoginID, ref struPushStreamIn, ref struPushStreamOut));
+
+
+        }
+
+        /// <summary>
+        /// 停止获取预览流
+        /// </summary>
+        /// <param name="streamId"></param>
+        public void StopGetRealStream(int streamId)
+        {
+            Invoke(NET_ECMS_StopGetRealStream(LoginID, streamId));
+        }
+
+        /// <summary>
+        /// 云台控制
+        /// </summary>
+        public void PtzControl(byte ptzCommand, byte action, byte speed)
+        {
+            var struPtzParam = NET_EHOME_PTZ_PARAM.NewInstance();
+            struPtzParam.byPTZCmd = ptzCommand;
+            struPtzParam.byAction = action;
+            struPtzParam.bySpeed = speed;
+            var ptrPtzParam = Marshal.AllocHGlobal(struPtzParam.dwSize);
+            try
+            {
+                Marshal.StructureToPtr(struPtzParam, ptrPtzParam, false);
+                var struRemoteCtrlParam = NET_EHOME_REMOTE_CTRL_PARAM.NewInstance();
+                struRemoteCtrlParam.lpInbuffer = ptrPtzParam;
+                struRemoteCtrlParam.dwInBufferSize = struPtzParam.dwSize;
+                Invoke(NET_ECMS_RemoteControl(LoginID, NET_EHOME_PTZ_CTRL, ref struRemoteCtrlParam));
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(ptrPtzParam);
+            }
         }
     }
 }

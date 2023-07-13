@@ -46,9 +46,6 @@ try
                 return false;
             }
 
-            //m_ConvertModel.UTF82A(struDevInfo.struRegInfo.byDeviceID, struDevInfo.struRegInfo.byDeviceID, MAX_DEVICE_ID_LEN, ref iOutLen);
-            //m_ConvertModel.UTF82A(struDevInfo.struRegInfo.sDeviceSerial, struDevInfo.struRegInfo.sDeviceSerial, NET_EHOME_SERIAL_LEN, ref iOutLen);
-
             struDevInfo.struRegInfo.byDeviceID.CopyTo(struTemp.byDeviceID, 0);
             struTemp.iLoginID = iUserID;
             struDevInfo.struRegInfo.sDeviceSerial.CopyTo(struTemp.sDeviceSerial, 0);
@@ -142,13 +139,9 @@ try
         {
             Marshal.StructureToPtr(struTemp, ptrTemp, false);
 
-            //m_ConvertModel.UTF82A(struDevInfo.struRegInfo.byDeviceID, struDevInfo.struRegInfo.byDeviceID, MAX_DEVICE_ID_LEN, ref iOutLen);
-            //m_ConvertModel.UTF82A(struDevInfo.struRegInfo.sDeviceSerial, struDevInfo.struRegInfo.sDeviceSerial, NET_EHOME_SERIAL_LEN, ref iOutLen);
-
             struDevInfo.struRegInfo.byDeviceID.CopyTo(struTemp.byDeviceID, 0);
             struTemp.iLoginID = iUserID;
             struDevInfo.struRegInfo.sDeviceSerial.CopyTo(struTemp.sDeviceSerial, 0);
-
 
             byte[] szDeviceSerial = new byte[NET_EHOME_SERIAL_LEN + 1];
             struDevInfo.struRegInfo.sDeviceSerial.CopyTo(szDeviceSerial, 0);

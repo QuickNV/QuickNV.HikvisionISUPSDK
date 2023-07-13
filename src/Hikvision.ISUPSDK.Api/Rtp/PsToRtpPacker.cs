@@ -77,7 +77,7 @@ namespace Hikvision.ISUPSDK.Api.Rtp
             while (data.Length > 0)
             {
                 //如果缓冲区满了，发送一次数据
-                if (payloadOffset >= RTP_PAYLOAD_LENGTH)
+                if (payloadOffset >= RTP_PAYLOAD_LENGTH - 2)
                 {
                     var sendSpan = allSpan.Slice(0, RTP_HEAD_LENGTH + payloadOffset);
                     sendRtpPackage(sendSpan);
