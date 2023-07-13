@@ -224,9 +224,11 @@ namespace Hikvision.ISUPSDK.Api
         /// <summary>
         /// 开始获取预览流
         /// </summary>
-        /// <param name="channelId"></param>
-        /// <param name="smsIPAddress"></param>
-        /// <param name="smsPort"></param>
+        /// <param name="smsIPAddress">媒体服务器IP地址</param>
+        /// <param name="smsPort">媒体服务器端口</param>
+        /// <param name="channelId">通道编号</param>
+        /// <param name="linkMode">连接模式</param>
+        /// <param name="streamType">流类型</param>
         /// <returns></returns>
         public int StartGetRealStreamV11(
             string smsIPAddress, int smsPort,
@@ -276,12 +278,20 @@ namespace Hikvision.ISUPSDK.Api
         /// <summary>
         /// 云台控制
         /// </summary>
-        public void PtzControl(byte ptzCommand, byte action, byte speed)
+        /// <param name="ptzCommand">云台指令</param>
+        /// <param name="start">是否开始，如果是否代表停止</param>
+        /// <param name="speed">速度移动。范围：0-1</param>
+        public void PtzControl(CmsPTZCommand ptzCommand, bool start, float speed)
         {
+            byte action;
+            if (start)
+                action = 0;
+            else
+                action = 1;
             var struPtzParam = NET_EHOME_PTZ_PARAM.NewInstance();
-            struPtzParam.byPTZCmd = ptzCommand;
+            struPtzParam.byPTZCmd = (byte)ptzCommand;
             struPtzParam.byAction = action;
-            struPtzParam.bySpeed = speed;
+            struPtzParam.bySpeed = Convert.ToByte(speed * 70);
             var ptrPtzParam = Marshal.AllocHGlobal(struPtzParam.dwSize);
             try
             {

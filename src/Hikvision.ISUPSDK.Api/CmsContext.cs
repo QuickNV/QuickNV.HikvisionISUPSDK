@@ -1,6 +1,8 @@
 ﻿using Hikvision.ISUPSDK.Api.Utils;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http.Headers;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,7 +15,19 @@ namespace Hikvision.ISUPSDK.Api
     {
         private CmsContextOptions options;
         private int listenHandle;
-        private Dictionary<int, DeviceContext> deviceDict = new Dictionary<int, DeviceContext>();
+        private Dictionary<int, DeviceContext> loginIdDeviceDict = new Dictionary<int, DeviceContext>();
+        private Dictionary<string, DeviceContext> deviceDict = new Dictionary<string, DeviceContext>();
+        public DeviceContext[] Devices { get; private set; } = new DeviceContext[0];
+        public DeviceContext GetDevice(string deviceId)
+        {
+            lock (deviceDict)
+            {
+                if (deviceDict.TryGetValue(deviceId, out var deviceContext))
+                    return deviceContext;
+            }
+            return null;
+        }
+
         public CmsContext(CmsContextOptions options)
         {
             this.options = options;
@@ -27,8 +41,12 @@ namespace Hikvision.ISUPSDK.Api
 
         public void Start()
         {
+            lock (loginIdDeviceDict)
+                loginIdDeviceDict.Clear();
             lock (deviceDict)
                 deviceDict.Clear();
+            Devices = new DeviceContext[0];
+
             //设置访问安全
             var m_struAccessSecure = new NET_EHOME_LOCAL_ACCESS_SECURITY();
             m_struAccessSecure.dwSize = Marshal.SizeOf(m_struAccessSecure);
@@ -93,8 +111,13 @@ namespace Hikvision.ISUPSDK.Api
                     {
                         Console.WriteLine(ex.ToString());
                     }
+                    lock (loginIdDeviceDict)
+                        loginIdDeviceDict[device.LoginID] = device;
                     lock (deviceDict)
-                        deviceDict[device.LoginID] = device;
+                    {
+                        deviceDict[device.Id] = device;
+                        Devices = deviceDict.Values.ToArray();
+                    }
                     //通知设备上线
                     DeviceOnline?.Invoke(this, device);
                 });
@@ -122,15 +145,22 @@ namespace Hikvision.ISUPSDK.Api
             else if (ENUM_DEV_OFF == dwDataType)
             {
                 DeviceContext deviceInfo = null;
+                lock (loginIdDeviceDict)
+                {
+                    if (!loginIdDeviceDict.TryGetValue(iUserID, out deviceInfo))
+                        return true;
+                    loginIdDeviceDict.Remove(iUserID);
+                }
                 lock (deviceDict)
                 {
-                    if (!deviceDict.ContainsKey(iUserID))
-                        return true;
-                    deviceInfo = deviceDict[iUserID];
-                    deviceDict.Remove(iUserID);
+                    if (deviceDict.ContainsKey(deviceInfo.Id))
+                    {
+                        deviceDict.Remove(deviceInfo.Id);
+                        Devices = deviceDict.Values.ToArray();
+                    }
                 }
                 DeviceOffline?.Invoke(this, deviceInfo);
-                return false;
+                return true;
             }
             //如果是Ehome5.0设备认证回调
             else if (ENUM_DEV_AUTH == dwDataType)
