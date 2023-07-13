@@ -9,7 +9,7 @@ short listenPort = 7660;
 
 try
 {
-    INIT_NATIVE_FILES();
+    INIT_NATIVE_DIR();
     Invoke(NET_ECMS_Init());
     Console.WriteLine("初始化成功！");
 

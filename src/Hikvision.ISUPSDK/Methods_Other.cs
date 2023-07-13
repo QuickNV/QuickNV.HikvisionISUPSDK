@@ -43,7 +43,7 @@ namespace Hikvision.ISUPSDK
             return nativeDir;
         }
 
-        public static void INIT_NATIVE_FILES()
+        public static void INIT_NATIVE_DIR()
         {
             if (IsWindows)
                 return;
@@ -51,23 +51,7 @@ namespace Hikvision.ISUPSDK
             var programDir = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
             var nativeDir = GET_NATIVE_DIR_PATH();
             nativeDir = Path.Combine(programDir, nativeDir);
-
-            foreach (var path in GET_LINUX_NATIVE_FILES())
-            {
-                var srcFi = new FileInfo(Path.Combine(nativeDir, path));
-                if (!srcFi.Exists)
-                    continue;
-                var desFi = new FileInfo(Path.Combine(programDir, path));
-                //如果文件存在，则大小相等，修改时间相同
-                if (desFi.Exists
-                    && desFi.Length == srcFi.Length
-                    && desFi.LastWriteTime == srcFi.LastWriteTime)
-                    continue;
-                var desDi = desFi.Directory;
-                if (!desDi.Exists)
-                    desDi.Create();
-                srcFi.CopyTo(desFi.FullName, true);
-            }
+            Environment.CurrentDirectory = nativeDir;
         }
 
         public static int Invoke(int result)

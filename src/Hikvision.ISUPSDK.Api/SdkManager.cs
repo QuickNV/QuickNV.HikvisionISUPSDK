@@ -10,7 +10,7 @@ namespace Hikvision.ISUPSDK.Api
             if (_Inited)
                 return;
 
-            INIT_NATIVE_FILES();
+            INIT_NATIVE_DIR();
             _Inited = true;
         }
     }
