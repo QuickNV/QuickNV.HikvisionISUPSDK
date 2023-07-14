@@ -26,6 +26,9 @@ namespace Hikvision.ISUPSDK.Api
         public SmsContext(SmsContextOptions options)
         {
             this.options = options;
+
+            fnPREVIEW_NEWLINK_CB = new PREVIEW_NEWLINK_CB(onPREVIEW_NEWLINK_CB);
+            fnPREVIEW_DATA_CB = new PREVIEW_DATA_CB(onPREVIEW_DATA_CB);
         }
 
         public static void Init()
@@ -42,9 +45,6 @@ namespace Hikvision.ISUPSDK.Api
             listenParam.fnNewLinkCB = fnPREVIEW_NEWLINK_CB;
             listenParam.byLinkMode = (byte)options.LinkMode;
             listenHandle = Invoke(NET_ESTREAM_StartListenPreview(ref listenParam));
-
-            fnPREVIEW_NEWLINK_CB = new PREVIEW_NEWLINK_CB(onPREVIEW_NEWLINK_CB);
-            fnPREVIEW_DATA_CB = new PREVIEW_DATA_CB(onPREVIEW_DATA_CB);
         }
 
         public void Stop()
