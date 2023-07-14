@@ -366,17 +366,18 @@ namespace Hikvision.ISUPSDK
         public struct NET_EHOME_PREVIEWINFO_IN_V11
         {
             public int iChannel;
-            public int dwStreamType;
-            public int dwLinkMode;
+            public uint dwStreamType;
+            public uint dwLinkMode;
             public NET_EHOME_IPADDRESS struStreamSever;
             public byte byDelayPreview;
-            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 31)]
+            public byte byEncrypt;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 30)]
             public byte[] byRes;
 
             public void Init()
             {
                 struStreamSever.Init();
-                byRes = new byte[31];
+                byRes = new byte[30];
             }
 
             public static NET_EHOME_PREVIEWINFO_IN_V11 NewInstance()
@@ -829,7 +830,7 @@ namespace Hikvision.ISUPSDK
         {
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 128, ArraySubType = UnmanagedType.U1)]
             public byte[] szIP;
-            public short wPort;     //端口
+            public ushort wPort;     //端口
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2)]
             public byte[] byRes;
             public void Init()

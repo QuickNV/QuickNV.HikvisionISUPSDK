@@ -9,7 +9,7 @@ namespace Hikvision.ISUPSDK.Api
     /// <summary>
     /// 码流类型
     /// </summary>
-    public enum SmsStreamType : byte
+    public enum SmsStreamType : uint
     {
         /// <summary>
         /// 主码流

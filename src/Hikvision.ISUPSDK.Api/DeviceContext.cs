@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Text;
 using static Hikvision.ISUPSDK.Defines;
 using static Hikvision.ISUPSDK.Methods;
 
@@ -238,11 +237,11 @@ namespace Hikvision.ISUPSDK.Api
             //预览请求的输入参数
             var struPreviewIn = NET_EHOME_PREVIEWINFO_IN_V11.NewInstance();
             struPreviewIn.iChannel = channelId; //通道号
-            struPreviewIn.dwLinkMode = (byte)linkMode;
-            struPreviewIn.dwStreamType = (byte)streamType;
+            struPreviewIn.dwLinkMode = (uint)linkMode;
+            struPreviewIn.dwStreamType = (uint)streamType;
             StringUtils.String2ByteArray(smsIPAddress, struPreviewIn.struStreamSever.szIP);
-            struPreviewIn.struStreamSever.wPort = (short)smsPort; //SMS 的端口号，需和监听端口号一致
-                                                                  //预览请求的输出参数
+            struPreviewIn.struStreamSever.wPort = (ushort)smsPort; //SMS 的端口号，需和监听端口号一致
+            //预览请求的输出参数
             var struPreviewOut = NET_EHOME_PREVIEWINFO_OUT.NewInstance();
             //预览请求
             Invoke(NET_ECMS_StartGetRealStreamV11(LoginID, ref struPreviewIn, ref struPreviewOut));

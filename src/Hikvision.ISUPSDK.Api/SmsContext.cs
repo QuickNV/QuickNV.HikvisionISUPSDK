@@ -34,7 +34,7 @@ namespace Hikvision.ISUPSDK.Api
         {
             var listenParam = NET_EHOME_LISTEN_PREVIEW_CFG.NewInstance();
             StringUtils.String2ByteArray(options.ListenIPAddress, listenParam.struIPAdress.szIP);
-            listenParam.struIPAdress.wPort = (short)options.ListenPort;
+            listenParam.struIPAdress.wPort = (ushort)options.ListenPort;
             listenParam.fnNewLinkCB = onPREVIEW_NEWLINK_CB;
             listenParam.byLinkMode = (byte)options.LinkMode;
             listenHandle = Invoke(NET_ESTREAM_StartListenPreview(ref listenParam));
@@ -51,10 +51,10 @@ namespace Hikvision.ISUPSDK.Api
             eventArgs.LinkHandle = lLinkHandle;
             eventArgs.SessionId = pNewLinkCBMsg.iSessionID;
             eventArgs.DeviceId = StringUtils.ByteArray2String(pNewLinkCBMsg.szDeviceID);
-            eventArgs.DeviceSerial = StringUtils.ByteArray2String(pNewLinkCBMsg.sDeviceSerial);
             eventArgs.ChannelId = pNewLinkCBMsg.dwChannelNo;
-            eventArgs.StreamFormat = pNewLinkCBMsg.byStreamFormat;
-            eventArgs.StreamType = pNewLinkCBMsg.byStreamType;
+            eventArgs.StreamFormat = (SmsStreamFormat)pNewLinkCBMsg.byStreamFormat;
+            eventArgs.StreamType = (SmsStreamType)pNewLinkCBMsg.byStreamType;
+            eventArgs.DeviceSerial = StringUtils.ByteArray2String(pNewLinkCBMsg.sDeviceSerial);
             //触发预览新连接事件
             PreviewNewlink?.Invoke(this, eventArgs);
             if (!eventArgs.Allowed)

@@ -1,6 +1,5 @@
 ﻿using Hikvision.ISUPSDK.Api;
 using Hikvision.ISUPSDK.Api.Rtp;
-using Hikvision.ISUPSDK.Api.Utils;
 using Newtonsoft.Json;
 
 var zlmServerIpAddress = "127.0.0.1";
@@ -13,7 +12,6 @@ var rtpSender = new TcpRtpSender(new RtpSenderOptions()
     Port = zlmServerRtpPort,
     SSRC = 0x12345678
 });
-rtpSender.Connect();
 
 CmsContext.Init();
 SmsContext.Init();
@@ -27,7 +25,7 @@ var smsOptions = new SmsContextOptions()
 {
     ListenIPAddress = "0.0.0.0",
     ListenPort = 7760,
-    LinkMode = SmsLinkMode.TCP
+    LinkMode = SmsLinkMode.UDP
 };
 
 var cmsContext = new CmsContext(cmsOptions);
@@ -42,9 +40,7 @@ void SmsContext_PreviewNewlink(object? sender, SmsContextPreviewNewlinkEventArgs
 {
     Console.WriteLine($"[SMS]新预览连接：" + JsonConvert.SerializeObject(e, Formatting.Indented));
     var mediaId = (int)e.SessionId;
-    var ssrc = MediaStreamUtils.GetSSRC(mediaId);
-    var streamId = MediaStreamUtils.GetStreamId(ssrc);
-    Console.WriteLine($"[SMS]MediaId:{mediaId},SSRC:{ssrc},StreamId:{streamId}");
+    Console.WriteLine($"[SMS]DeviceSerial:{e.DeviceSerial},Channel:{e.ChannelId},MediaId:{mediaId},StreamFormat:{e.StreamFormat},StreamType:{e.StreamType}");
 }
 
 void SmsContext_PreviewData(object? sender, SmsContextPreviewDataEventArgs e)
@@ -64,8 +60,17 @@ void Context_DeviceOffline(object? sender, DeviceContext e)
 void Context_DeviceOnline(object? sender, DeviceContext e)
 {
     Console.WriteLine("[CMS]设备上线！" + JsonConvert.SerializeObject(e, Formatting.Indented));
-    var streamId = e.StartGetRealStreamV11(smsServerIpAddrss, smsOptions.ListenPort, 1, SmsLinkMode.TCP, SmsStreamType.Main);
-    e.StartPushRealStream(streamId);
+    try
+    {
+        var streamId = e.StartGetRealStreamV11(smsServerIpAddrss, smsOptions.ListenPort, 1, SmsLinkMode.UDP, SmsStreamType.Sub);
+        Console.WriteLine("[CMS]StreamId:" + streamId);
+        rtpSender.Connect();
+        e.StartPushRealStream(streamId);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("发起推流失败。" + ex.ToString());
+    }
 }
 
 Console.WriteLine($"正在启动SMS...");

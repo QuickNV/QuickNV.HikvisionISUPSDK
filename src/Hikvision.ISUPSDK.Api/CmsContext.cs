@@ -66,7 +66,7 @@ namespace Hikvision.ISUPSDK.Api
             var cmd_listen_param = new NET_EHOME_CMS_LISTEN_PARAM();
             cmd_listen_param.struAddress.Init();
             StringUtils.String2ByteArray(options.ListenIPAddress, cmd_listen_param.struAddress.szIP);
-            cmd_listen_param.struAddress.wPort = Convert.ToInt16(options.ListenPort);
+            cmd_listen_param.struAddress.wPort = Convert.ToUInt16(options.ListenPort);
             cmd_listen_param.fnCB = onDEVICE_REGISTER_CB;
             cmd_listen_param.byRes = new byte[32];
             listenHandle = Invoke(NET_ECMS_StartListen(ref cmd_listen_param));

@@ -13,13 +13,7 @@ namespace Hikvision.ISUPSDK.Api
         public string DeviceId { get; set; }
         public string DeviceSerial { get; set; }
         public int ChannelId { get; set; }
-        /// <summary>
-        /// 0-主码流，1-子码流
-        /// </summary>
-        public byte StreamType { get; set; }
-        /// <summary>
-        /// //封装格式：0- PS,1-标准流(入参)
-        /// </summary>
-        public byte StreamFormat { get; set; }
+        public SmsStreamType StreamType { get; set; }
+        public SmsStreamFormat StreamFormat { get; set; }
     }
 }

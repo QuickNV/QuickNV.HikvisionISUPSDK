@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Hikvision.ISUPSDK.Api
 {
-    public enum SmsLinkMode : byte
+    public enum SmsLinkMode : uint
     {
         TCP = 0,
         UDP = 1,

@@ -5,7 +5,7 @@ using static Hikvision.ISUPSDK.Defines;
 using static Hikvision.ISUPSDK.Methods;
 
 var listenIPAddress = "0.0.0.0";
-short listenPort = 7660;
+ushort listenPort = 7660;
 
 try
 {
