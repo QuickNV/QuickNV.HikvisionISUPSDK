@@ -17,6 +17,7 @@ SDK错误枚举：Hikvision.ISUPSDK.Errors
 using Hikvision.ISUPSDK.Api;
 using Hikvision.ISUPSDK.Api.Rtp;
 using Newtonsoft.Json;
+using System.Security.AccessControl;
 
 var zlmServerIpAddress = "127.0.0.1";
 var zlmServerRtpPort = 10000;
@@ -48,12 +49,15 @@ var cmsContext = new CmsContext(cmsOptions);
 cmsContext.DeviceOnline += Context_DeviceOnline;
 cmsContext.DeviceOffline += Context_DeviceOffline;
 
+SmsStreamFormat streamFormat = SmsStreamFormat.PS;
+
 var smsContext = new SmsContext(smsOptions);
 smsContext.PreviewNewlink += SmsContext_PreviewNewlink;
 smsContext.PreviewData += SmsContext_PreviewData;
 
 void SmsContext_PreviewNewlink(object? sender, SmsContextPreviewNewlinkEventArgs e)
 {
+    streamFormat = e.StreamFormat;
     Console.WriteLine($"[SMS]新预览连接：" + JsonConvert.SerializeObject(e, Formatting.Indented));
     var mediaId = (int)e.SessionId;
     Console.WriteLine($"[SMS]DeviceSerial:{e.DeviceSerial},Channel:{e.ChannelId},MediaId:{mediaId},StreamFormat:{e.StreamFormat},StreamType:{e.StreamType}");
@@ -63,9 +67,16 @@ void SmsContext_PreviewData(object? sender, SmsContextPreviewDataEventArgs e)
 {
     if (e.DataType == SmsContextPreviewDataType.NET_DVR_SYSHEAD)
         return;
-
     var dataSpan = e.GetDataSpan();
-    rtpSender.Write(dataSpan);
+    switch (streamFormat)
+    {
+        case SmsStreamFormat.PS:
+            rtpSender.SendPsPacket(dataSpan);
+            break;
+        case SmsStreamFormat.Standard:
+            rtpSender.SendRtpPacket(dataSpan);
+            break;
+    }
 }
 
 void Context_DeviceOffline(object? sender, DeviceContext e)

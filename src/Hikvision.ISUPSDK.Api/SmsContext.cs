@@ -10,6 +10,9 @@ namespace Hikvision.ISUPSDK.Api
     {
         private SmsContextOptions options;
         private int listenHandle;
+        private PREVIEW_NEWLINK_CB fnNewLinkCB;
+        private PREVIEW_DATA_CB fnPreviewDataCB;
+
         /// <summary>
         /// 新预览连接时
         /// </summary>
@@ -22,6 +25,8 @@ namespace Hikvision.ISUPSDK.Api
         public SmsContext(SmsContextOptions options)
         {
             this.options = options;
+            fnNewLinkCB = new PREVIEW_NEWLINK_CB(onPREVIEW_NEWLINK_CB);
+            fnPreviewDataCB = new PREVIEW_DATA_CB(onPREVIEW_DATA_CB);
         }
 
         public static void Init()
@@ -35,7 +40,7 @@ namespace Hikvision.ISUPSDK.Api
             var listenParam = NET_EHOME_LISTEN_PREVIEW_CFG.NewInstance();
             StringUtils.String2ByteArray(options.ListenIPAddress, listenParam.struIPAdress.szIP);
             listenParam.struIPAdress.wPort = (ushort)options.ListenPort;
-            listenParam.fnNewLinkCB = onPREVIEW_NEWLINK_CB;
+            listenParam.fnNewLinkCB = fnNewLinkCB;
             listenParam.byLinkMode = (byte)options.LinkMode;
             listenHandle = Invoke(NET_ESTREAM_StartListenPreview(ref listenParam));
         }
@@ -62,8 +67,9 @@ namespace Hikvision.ISUPSDK.Api
             //注册接收数据回调
             var struCBParam = new NET_EHOME_PREVIEW_DATA_CB_PARAM();
             struCBParam.Init();
-            struCBParam.fnPreviewDataCB = onPREVIEW_DATA_CB;
+            struCBParam.fnPreviewDataCB = fnPreviewDataCB;
             NET_ESTREAM_SetPreviewDataCB(lLinkHandle, ref struCBParam);
+            NET_ESTREAM_SetStandardPreviewDataCB(lLinkHandle, ref struCBParam);
             return true;
         }
 
