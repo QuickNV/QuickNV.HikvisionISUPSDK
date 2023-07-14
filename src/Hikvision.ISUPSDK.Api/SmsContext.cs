@@ -11,22 +11,28 @@ namespace Hikvision.ISUPSDK.Api
         private SmsContextOptions options;
         private int listenHandle;
         private PREVIEW_NEWLINK_CB fnNewLinkCB;
-        private PREVIEW_DATA_CB fnPreviewDataCB;
+        private PREVIEW_DATA_CB fnPreviewPsDataCB;
+        private PREVIEW_DATA_CB fnPreviewRtpDataCB;
 
         /// <summary>
         /// 新预览连接时
         /// </summary>
         public event EventHandler<SmsContextPreviewNewlinkEventArgs> PreviewNewlink;
         /// <summary>
-        /// 接收到预览数据时
+        /// 接收到预览PS流数据时
         /// </summary>
-        public event EventHandler<SmsContextPreviewDataEventArgs> PreviewData;
+        public event EventHandler<SmsContextPreviewDataEventArgs> PreviewPsData;
+        /// <summary>
+        /// 接收到预览RTP流数据时
+        /// </summary>
+        public event EventHandler<SmsContextPreviewDataEventArgs> PreviewRtpData;
 
         public SmsContext(SmsContextOptions options)
         {
             this.options = options;
             fnNewLinkCB = new PREVIEW_NEWLINK_CB(onPREVIEW_NEWLINK_CB);
-            fnPreviewDataCB = new PREVIEW_DATA_CB(onPREVIEW_DATA_CB);
+            fnPreviewPsDataCB = new PREVIEW_DATA_CB(onPREVIEW_PS_DATA_CB);
+            fnPreviewRtpDataCB = new PREVIEW_DATA_CB(onPREVIEW_RTP_DATA_CB);
         }
 
         public static void Init()
@@ -67,21 +73,39 @@ namespace Hikvision.ISUPSDK.Api
             //注册接收数据回调
             var struCBParam = new NET_EHOME_PREVIEW_DATA_CB_PARAM();
             struCBParam.Init();
-            struCBParam.fnPreviewDataCB = fnPreviewDataCB;
+            struCBParam.fnPreviewDataCB = fnPreviewPsDataCB;
             NET_ESTREAM_SetPreviewDataCB(lLinkHandle, ref struCBParam);
-            NET_ESTREAM_SetStandardPreviewDataCB(lLinkHandle, ref struCBParam);
+            struCBParam.fnPreviewDataCB = fnPreviewRtpDataCB;
+            NET_ESTREAM_SetPreviewDataCB(lLinkHandle, ref struCBParam);
             return true;
         }
 
-        private void onPREVIEW_DATA_CB(int iPreviewHandle, ref NET_EHOME_PREVIEW_CB_MSG pPreviewCBMsg, IntPtr pUserData)
+        private void onPREVIEW_PS_DATA_CB(int iPreviewHandle, ref NET_EHOME_PREVIEW_CB_MSG pPreviewCBMsg, IntPtr pUserData)
         {
-            var eventArgs = new SmsContextPreviewDataEventArgs();
-            eventArgs.LinkHandle = iPreviewHandle;
-            eventArgs.DataIntPtr = pPreviewCBMsg.pRecvdata;
-            eventArgs.DataLength = pPreviewCBMsg.dwDataLen;
-            eventArgs.DataType = (SmsContextPreviewDataType)pPreviewCBMsg.byDataType;
+            var dataType = (SmsContextPreviewDataType)pPreviewCBMsg.byDataType;
+            if (dataType != SmsContextPreviewDataType.NET_DVR_STREAMDATA)
+                return;
+
+            var eventArgs = new SmsContextPreviewDataEventArgs(
+                iPreviewHandle,
+                pPreviewCBMsg.pRecvdata,
+                pPreviewCBMsg.dwDataLen);
             //触发接收到预览数据事件
-            PreviewData?.Invoke(this, eventArgs);
+            PreviewPsData?.Invoke(this, eventArgs);
+        }
+
+        private void onPREVIEW_RTP_DATA_CB(int iPreviewHandle, ref NET_EHOME_PREVIEW_CB_MSG pPreviewCBMsg, IntPtr pUserData)
+        {
+            var dataType = (SmsContextPreviewDataType)pPreviewCBMsg.byDataType;
+            if (dataType != SmsContextPreviewDataType.NET_DVR_STREAMDATA)
+                return;
+
+            var eventArgs = new SmsContextPreviewDataEventArgs(
+                iPreviewHandle,
+                pPreviewCBMsg.pRecvdata,
+                pPreviewCBMsg.dwDataLen);
+            //触发接收到预览数据事件
+            PreviewRtpData?.Invoke(this, eventArgs);
         }
     }
 }

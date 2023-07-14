@@ -49,34 +49,26 @@ var cmsContext = new CmsContext(cmsOptions);
 cmsContext.DeviceOnline += Context_DeviceOnline;
 cmsContext.DeviceOffline += Context_DeviceOffline;
 
-SmsStreamFormat streamFormat = SmsStreamFormat.PS;
-
 var smsContext = new SmsContext(smsOptions);
 smsContext.PreviewNewlink += SmsContext_PreviewNewlink;
-smsContext.PreviewData += SmsContext_PreviewData;
+smsContext.PreviewPsData += SmsContext_PreviewPsData;
+smsContext.PreviewRtpData += SmsContext_PreviewRtpData;
 
 void SmsContext_PreviewNewlink(object? sender, SmsContextPreviewNewlinkEventArgs e)
 {
-    streamFormat = e.StreamFormat;
     Console.WriteLine($"[SMS]新预览连接：" + JsonConvert.SerializeObject(e, Formatting.Indented));
     var mediaId = (int)e.SessionId;
     Console.WriteLine($"[SMS]DeviceSerial:{e.DeviceSerial},Channel:{e.ChannelId},MediaId:{mediaId},StreamFormat:{e.StreamFormat},StreamType:{e.StreamType}");
 }
 
-void SmsContext_PreviewData(object? sender, SmsContextPreviewDataEventArgs e)
+void SmsContext_PreviewPsData(object? sender, SmsContextPreviewDataEventArgs e)
 {
-    if (e.DataType == SmsContextPreviewDataType.NET_DVR_SYSHEAD)
-        return;
-    var dataSpan = e.GetDataSpan();
-    switch (streamFormat)
-    {
-        case SmsStreamFormat.PS:
-            rtpSender.SendPsPacket(dataSpan);
-            break;
-        case SmsStreamFormat.Standard:
-            rtpSender.SendRtpPacket(dataSpan);
-            break;
-    }
+    rtpSender.SendPsPacket(e.GetDataSpan());
+}
+
+void SmsContext_PreviewRtpData(object? sender, SmsContextPreviewDataEventArgs e)
+{
+    rtpSender.SendRtpPacket(e.GetDataSpan());
 }
 
 void Context_DeviceOffline(object? sender, DeviceContext e)
