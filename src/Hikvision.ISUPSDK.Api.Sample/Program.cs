@@ -45,9 +45,6 @@ void SmsContext_PreviewNewlink(object? sender, SmsContextPreviewNewlinkEventArgs
 
 void SmsContext_PreviewData(object? sender, SmsContextPreviewDataEventArgs e)
 {
-    if (e.DataType == SmsContextPreviewDataType.NET_DVR_SYSHEAD)
-        return;
-
     var dataSpan = e.GetDataSpan();
     rtpSender.Write(dataSpan);
 }

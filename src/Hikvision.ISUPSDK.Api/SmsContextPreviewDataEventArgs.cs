@@ -6,10 +6,9 @@ namespace Hikvision.ISUPSDK.Api
 {
     public class SmsContextPreviewDataEventArgs
     {
-        public int LinkHandle { get; set; }
-        public IntPtr DataIntPtr { get; set; }
-        public int DataLength { get; set; }
-        public SmsContextPreviewDataType DataType { get; set; }
+        public int LinkHandle { get; private set; }
+        private IntPtr DataIntPtr;
+        private int DataLength;
 
         public Span<byte> GetDataSpan()
         {
@@ -17,6 +16,13 @@ namespace Hikvision.ISUPSDK.Api
             {
                 return new Span<byte>(DataIntPtr.ToPointer(), DataLength);
             }
+        }
+
+        public SmsContextPreviewDataEventArgs(int linkHandle, IntPtr dataIntPtr, int dataLength)
+        {
+            LinkHandle = linkHandle;
+            DataIntPtr = dataIntPtr;
+            DataLength = dataLength;
         }
     }
 }

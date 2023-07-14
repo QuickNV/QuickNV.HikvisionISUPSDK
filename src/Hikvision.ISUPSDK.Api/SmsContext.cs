@@ -10,6 +10,10 @@ namespace Hikvision.ISUPSDK.Api
     {
         private SmsContextOptions options;
         private int listenHandle;
+
+        private PREVIEW_NEWLINK_CB fnPREVIEW_NEWLINK_CB;
+        private PREVIEW_DATA_CB fnPREVIEW_DATA_CB;
+
         /// <summary>
         /// 新预览连接时
         /// </summary>
@@ -35,9 +39,12 @@ namespace Hikvision.ISUPSDK.Api
             var listenParam = NET_EHOME_LISTEN_PREVIEW_CFG.NewInstance();
             StringUtils.String2ByteArray(options.ListenIPAddress, listenParam.struIPAdress.szIP);
             listenParam.struIPAdress.wPort = (ushort)options.ListenPort;
-            listenParam.fnNewLinkCB = onPREVIEW_NEWLINK_CB;
+            listenParam.fnNewLinkCB = fnPREVIEW_NEWLINK_CB;
             listenParam.byLinkMode = (byte)options.LinkMode;
             listenHandle = Invoke(NET_ESTREAM_StartListenPreview(ref listenParam));
+
+            fnPREVIEW_NEWLINK_CB = new PREVIEW_NEWLINK_CB(onPREVIEW_NEWLINK_CB);
+            fnPREVIEW_DATA_CB = new PREVIEW_DATA_CB(onPREVIEW_DATA_CB);
         }
 
         public void Stop()
@@ -62,18 +69,17 @@ namespace Hikvision.ISUPSDK.Api
             //注册接收数据回调
             var struCBParam = new NET_EHOME_PREVIEW_DATA_CB_PARAM();
             struCBParam.Init();
-            struCBParam.fnPreviewDataCB = onPREVIEW_DATA_CB;
+            struCBParam.fnPreviewDataCB = fnPREVIEW_DATA_CB;
             NET_ESTREAM_SetPreviewDataCB(lLinkHandle, ref struCBParam);
             return true;
         }
 
         private void onPREVIEW_DATA_CB(int iPreviewHandle, ref NET_EHOME_PREVIEW_CB_MSG pPreviewCBMsg, IntPtr pUserData)
         {
-            var eventArgs = new SmsContextPreviewDataEventArgs();
-            eventArgs.LinkHandle = iPreviewHandle;
-            eventArgs.DataIntPtr = pPreviewCBMsg.pRecvdata;
-            eventArgs.DataLength = pPreviewCBMsg.dwDataLen;
-            eventArgs.DataType = (SmsContextPreviewDataType)pPreviewCBMsg.byDataType;
+            var dataType = (SmsContextPreviewDataType)pPreviewCBMsg.byDataType;
+            if (dataType != SmsContextPreviewDataType.NET_DVR_STREAMDATA)
+                return;
+            var eventArgs = new SmsContextPreviewDataEventArgs(iPreviewHandle, pPreviewCBMsg.pRecvdata, pPreviewCBMsg.dwDataLen);
             //触发接收到预览数据事件
             PreviewData?.Invoke(this, eventArgs);
         }
