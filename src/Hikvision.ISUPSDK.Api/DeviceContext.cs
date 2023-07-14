@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Threading.Channels;
 using static Hikvision.ISUPSDK.Defines;
 using static Hikvision.ISUPSDK.Methods;
 
@@ -277,10 +278,11 @@ namespace Hikvision.ISUPSDK.Api
         /// <summary>
         /// 云台控制
         /// </summary>
+        /// <param name="channelId">通道编号</param>
         /// <param name="ptzCommand">云台指令</param>
         /// <param name="start">是否开始，如果是否代表停止</param>
         /// <param name="speed">速度移动。范围：0-1</param>
-        public void PtzControl(CmsPTZCommand ptzCommand, bool start, float speed)
+        public void PtzControl(int channelId, CmsPTZCommand ptzCommand, bool start, float speed)
         {
             byte action;
             if (start)
@@ -290,12 +292,17 @@ namespace Hikvision.ISUPSDK.Api
             var struPtzParam = NET_EHOME_PTZ_PARAM.NewInstance();
             struPtzParam.byPTZCmd = (byte)ptzCommand;
             struPtzParam.byAction = action;
-            struPtzParam.bySpeed = Convert.ToByte(speed * 70);
+            struPtzParam.bySpeed = Convert.ToByte(speed * 7);
             var ptrPtzParam = Marshal.AllocHGlobal(struPtzParam.dwSize);
             try
             {
                 Marshal.StructureToPtr(struPtzParam, ptrPtzParam, false);
+                var channelIdBuffer = BitConverter.GetBytes(channelId);
+                IntPtr ptrChannel = Marshal.UnsafeAddrOfPinnedArrayElement(channelIdBuffer, 0);
+
                 var struRemoteCtrlParam = NET_EHOME_REMOTE_CTRL_PARAM.NewInstance();
+                struRemoteCtrlParam.lpCondBuffer = ptrChannel;
+                struRemoteCtrlParam.dwCondBufferSize = channelIdBuffer.Length;
                 struRemoteCtrlParam.lpInbuffer = ptrPtzParam;
                 struRemoteCtrlParam.dwInBufferSize = struPtzParam.dwSize;
                 Invoke(NET_ECMS_RemoteControl(LoginID, NET_EHOME_PTZ_CTRL, ref struRemoteCtrlParam));
