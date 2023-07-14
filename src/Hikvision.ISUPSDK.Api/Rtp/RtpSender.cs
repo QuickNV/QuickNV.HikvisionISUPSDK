@@ -24,16 +24,9 @@ namespace Hikvision.ISUPSDK.Api.Rtp
         }
 
         public abstract void Connect();
-        /// <summary>
-        /// 发送RTP数据包
-        /// </summary>
-        /// <param name="packet"></param>
-        public abstract void SendRtpPacket(ReadOnlySpan<byte> packet);
-        /// <summary>
-        /// 发送PS数据包
-        /// </summary>
-        /// <param name="data"></param>
-        public void SendPsPacket(Span<byte> data)
+        protected abstract void SendRtpPacket(ArraySegment<byte> packet);
+
+        public void Write(Span<byte> data)
         {
             packer.Write(data);
         }

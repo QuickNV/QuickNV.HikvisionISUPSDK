@@ -20,9 +20,9 @@ namespace Hikvision.ISUPSDK.Api.Rtp
             stream = tcpClient.GetStream();
         }
 
-        public override void SendRtpPacket(ReadOnlySpan<byte> packet)
+        protected override void SendRtpPacket(ArraySegment<byte> packet)
         {
-            var length = Convert.ToUInt16(packet.Length);
+            var length = Convert.ToUInt16(packet.Count);
             var lengthSpan = new Span<byte>(buffer);
             BitConverter.TryWriteBytes(lengthSpan, length);
             if (BitConverter.IsLittleEndian)

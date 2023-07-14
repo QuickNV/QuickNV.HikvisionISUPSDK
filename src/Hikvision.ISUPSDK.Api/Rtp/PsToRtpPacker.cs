@@ -11,10 +11,6 @@ namespace Hikvision.ISUPSDK.Api.Rtp
     {
         public const int PS_ANY_HEAD_LENGTH = 4;
         public const int PS_ANY_HEAD_LENGTH_LENGTH = 2;
-        /// <summary>
-        /// PS流开始头
-        /// </summary>
-        public static byte[] PsStartHeader = new byte[] { 0x00, 0x00, 0x01, 0xBA };
 
         public const int RTP_HEAD_LENGTH = 12;
         public const int RTP_PAYLOAD_LENGTH = 1400;
@@ -47,7 +43,7 @@ namespace Hikvision.ISUPSDK.Api.Rtp
         {
             SSRC = ssrc;
 
-            buffer = new byte[RTP_PACKET_LENGTH];
+            buffer = new byte[RTP_PACKET_LENGTH * 2];
             buffer[0] = 0x80;
             buffer[1] = 0x60;
             //RTP头
@@ -138,7 +134,7 @@ namespace Hikvision.ISUPSDK.Api.Rtp
                                 continue;
 
                             //如果是PS头
-                            if (head.SequenceEqual(PsStartHeader))
+                            if (head.SequenceEqual(PsHeaders.PsStartHeader))
                             {
                                 //如果发现了已经有PS包头，则发送一次数据
                                 if (readOffset > RTP_HEAD_LENGTH + head.Length)

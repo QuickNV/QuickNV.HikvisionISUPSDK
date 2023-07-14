@@ -23,7 +23,7 @@ namespace Hikvision.ISUPSDK.Api
             udpClient = new UdpClient();
         }
 
-        public override void SendRtpPacket(ReadOnlySpan<byte> packet)
+        protected override void SendRtpPacket(ArraySegment<byte> packet)
         {
             udpClient.Send(packet, remoteEndPoint);
         }
