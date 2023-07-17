@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http.Headers;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -107,9 +106,11 @@ namespace Hikvision.ISUPSDK.Api
                     {
                         device.Load();
                     }
-                    catch (Exception ex)
+                    catch
                     {
-                        Console.WriteLine(ex.ToString());
+                        //如果读取设备信息出错，则强制退出登录
+                        NET_ECMS_ForceLogout(iUserID);
+                        return;
                     }
                     lock (loginIdDeviceDict)
                         loginIdDeviceDict[device.LoginID] = device;
@@ -139,7 +140,6 @@ namespace Hikvision.ISUPSDK.Api
                 IntPtr ptrStruS = Marshal.AllocHGlobal(TdwSize);
                 Marshal.StructureToPtr(struServInfo, ptrStruS, false);
                 Marshal.StructureToPtr(struServInfo, pInBuffer, false);
-                return true;
             }
             //如果是设备下线回调
             else if (ENUM_DEV_OFF == dwDataType)
@@ -160,12 +160,12 @@ namespace Hikvision.ISUPSDK.Api
                     }
                 }
                 DeviceOffline?.Invoke(this, deviceInfo);
-                return true;
             }
             //如果是Ehome5.0设备认证回调
             else if (ENUM_DEV_AUTH == dwDataType)
             {
-
+                var buffer = Encoding.ASCII.GetBytes(options.Password.PadRight(32, char.MinValue));
+                Marshal.Copy(buffer, 0, pInBuffer, buffer.Length);
             }
             //如果是Ehome5.0设备Sessionkey回调
             else if (ENUM_DEV_SESSIONKEY == dwDataType)
@@ -179,32 +179,44 @@ namespace Hikvision.ISUPSDK.Api
             //如果是Ehome5.0设备重定向请求回调
             else if (ENUM_DEV_DAS_REQ == dwDataType)
             {
-                string szLocalIP = "";
-                //IntPtr ptrLocalIP = Marshal.AllocHGlobal(128);
-                //ptrLocalIP=Marshal.StringToHGlobalAnsi(szLocalIP);
-                //szLocalIP = SelectIP.IpAddressList[0].ToString();
-                IntPtr ptrLocalIP = IntPtr.Zero;
-                int dwPort = 0;
-                //GetAddressByType(3, 0, ref ptrLocalIP, 128, ref dwPort, 4);
-                szLocalIP = Marshal.PtrToStringAnsi(ptrLocalIP);
-                //if (0 == dwPort)
-                //{
-                //    dwPort = m_nPort;
-                //}
-                string portTemp = dwPort.ToString();
-                string strInBuffer = "{\"Type\":\"DAS\",\"DasInfo\":{\"Address\":\"" + szLocalIP + "\"," +
-                "\"Domain\":\"test.ys7.com\",\"ServerID\":\"das_" + szLocalIP + "_" + portTemp + "\",\"Port\":" + portTemp + ",\"UdpPort\":" + portTemp + "}}";
-
-                byte[] byTemp = System.Text.Encoding.Default.GetBytes(strInBuffer);
-                Marshal.Copy(byTemp, 0, pInBuffer, byTemp.Length);
-
+                var port = options.ServerPort;
+                if (port == null)
+                    port = options.ListenPort;
+                var rep = new DeviceDasResponse()
+                {
+                    Type = "DAS",
+                    DasInfo = new DeviceDasResponse_DasInfo()
+                    {
+                        Address = options.ServerHost,
+                        Domain = "test.ys7.com",
+                        ServerID = $"das_{options.ServerHost}_{port}",
+                        Port = port.Value,
+                        UdpPort = port.Value
+                    }
+                };
+                var dasInfoString = System.Text.Json.JsonSerializer.Serialize(rep);
+                var dasInfoBuffer = Encoding.Default.GetBytes(dasInfoString);
+                Marshal.Copy(dasInfoBuffer, 0, pInBuffer, dasInfoBuffer.Length);
             }
             //如果是设备地址发生变化回调
             else if (ENUM_DEV_ADDRESS_CHANGED == dwDataType)
             {
-
             }
             return true;
+        }
+
+        private class DeviceDasResponse_DasInfo
+        {
+            public string Address { get; set; }
+            public string Domain { get; set; }
+            public string ServerID { get; set; }
+            public int Port { get; set; }
+            public int UdpPort { get; set; }
+        }
+        private class DeviceDasResponse
+        {
+            public string Type { get; set; }
+            public DeviceDasResponse_DasInfo DasInfo { get; set; }
         }
     }
 }

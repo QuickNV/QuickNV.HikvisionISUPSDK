@@ -19,7 +19,9 @@ SmsContext.Init();
 var cmsOptions = new CmsContextOptions()
 {
     ListenIPAddress = "0.0.0.0",
-    ListenPort = 7660
+    ListenPort = 7660,
+    Password = "123456",
+    ServerHost = smsServerIpAddrss
 };
 var smsOptions = new SmsContextOptions()
 {

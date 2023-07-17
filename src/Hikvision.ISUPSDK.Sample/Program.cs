@@ -4,8 +4,10 @@ using System.Text;
 using static Hikvision.ISUPSDK.Defines;
 using static Hikvision.ISUPSDK.Methods;
 
-var listenIPAddress = "0.0.0.0";
-ushort listenPort = 7660;
+var smsServerIpAddrss = "127.0.0.1";
+var smsListenIpAddress = "0.0.0.0";
+var smsPassword = "123456";
+ushort smsListenPort = 7660;
 
 try
 {
@@ -88,23 +90,20 @@ try
         {
             Console.WriteLine("设备下线！");
             Marshal.StructureToPtr(iUserID, ptrTemp, false);
-
-            //Message mes = new Message();
-            //mes.Msg = ISUPDemo.WM_DEL_DEV;
-            //mes.LParam = ptrTemp;
-            //g_deviceTree.ProDevStatu(mes);
-
-            //PostMessage(m_treeHandle, ISUPDemo.WM_DEL_DEV, ptrTemp, ptrTemp);
             return false;
         }
         //如果是Ehome5.0设备认证回调
         else if (ENUM_DEV_AUTH == dwDataType)
         {
-
+            Console.WriteLine("Ehome5.0设备认证回调");
+            var buffer = Encoding.ASCII.GetBytes(smsPassword.PadRight(32, char.MinValue));
+            Marshal.Copy(buffer, 0, pInBuffer, buffer.Length);
+            return true;
         }
         //如果是Ehome5.0设备Sessionkey回调
         else if (ENUM_DEV_SESSIONKEY == dwDataType)
         {
+            Console.WriteLine("Ehome5.0设备Sessionkey回调");
             NET_EHOME_DEV_SESSIONKEY devSessionkey = new NET_EHOME_DEV_SESSIONKEY();
             devSessionkey.Init();
             struDevInfo.struRegInfo.byDeviceID.CopyTo(devSessionkey.sDeviceID, 0);
@@ -114,29 +113,16 @@ try
         //如果是Ehome5.0设备重定向请求回调
         else if (ENUM_DEV_DAS_REQ == dwDataType)
         {
-            string szLocalIP = "";
-            //IntPtr ptrLocalIP = Marshal.AllocHGlobal(128);
-            //ptrLocalIP=Marshal.StringToHGlobalAnsi(szLocalIP);
-            //szLocalIP = SelectIP.IpAddressList[0].ToString();
-            IntPtr ptrLocalIP = IntPtr.Zero;
-            int dwPort = 0;
-            //GetAddressByType(3, 0, ref ptrLocalIP, 128, ref dwPort, 4);
-            szLocalIP = Marshal.PtrToStringAnsi(ptrLocalIP);
-            //if (0 == dwPort)
-            //{
-            //    dwPort = m_nPort;
-            //}
-            string portTemp = dwPort.ToString();
-            string strInBuffer = "{\"Type\":\"DAS\",\"DasInfo\":{\"Address\":\"" + szLocalIP + "\"," +
-            "\"Domain\":\"test.ys7.com\",\"ServerID\":\"das_" + szLocalIP + "_" + portTemp + "\",\"Port\":" + portTemp + ",\"UdpPort\":" + portTemp + "}}";
-
-            byte[] byTemp = System.Text.Encoding.Default.GetBytes(strInBuffer);
+            Console.WriteLine("Ehome5.0设备重定向请求回调");
+            string strInBuffer = "{\"Type\":\"DAS\",\"DasInfo\":{\"Address\":\"" + smsServerIpAddrss + "\"," +
+            "\"Domain\":\"test.ys7.com\",\"ServerID\":\"das_" + smsServerIpAddrss + "_" + smsListenPort + "\",\"Port\":" + smsListenPort + ",\"UdpPort\":" + smsListenPort + "}}";
+            byte[] byTemp = Encoding.Default.GetBytes(strInBuffer);
             Marshal.Copy(byTemp, 0, pInBuffer, byTemp.Length);
-
         }
         //如果是设备地址发生变化回调
         else if (ENUM_DEV_ADDRESS_CHANGED == dwDataType)
         {
+            Console.WriteLine("设备地址发生变化回调");
             Marshal.StructureToPtr(struTemp, ptrTemp, false);
 
             struDevInfo.struRegInfo.byDeviceID.CopyTo(struTemp.byDeviceID, 0);
@@ -163,12 +149,12 @@ try
     };
     var cmd_listen_param = new NET_EHOME_CMS_LISTEN_PARAM();
     cmd_listen_param.struAddress.Init();
-    Encoding.Default.GetBytes(listenIPAddress, 0, listenIPAddress.Length, cmd_listen_param.struAddress.szIP, 0);
-    cmd_listen_param.struAddress.wPort = listenPort;
+    Encoding.Default.GetBytes(smsListenIpAddress, 0, smsListenIpAddress.Length, cmd_listen_param.struAddress.szIP, 0);
+    cmd_listen_param.struAddress.wPort = smsListenPort;
     cmd_listen_param.fnCB = device_register_cb;
     cmd_listen_param.byRes = new byte[32];
 
-    Console.WriteLine($"正在监听：{listenIPAddress}:{listenPort}...");
+    Console.WriteLine($"正在监听：{smsListenIpAddress}:{smsListenPort}...");
     var listenHandle = Invoke(NET_ECMS_StartListen(ref cmd_listen_param));
     Console.WriteLine("开始监听！");
 

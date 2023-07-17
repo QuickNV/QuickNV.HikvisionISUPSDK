@@ -198,7 +198,7 @@ namespace Hikvision.ISUPSDK.Api
                 var ci = getChannelInfo(channelId);
                 list.Add(new ChannelInfo()
                 {
-                    Id = i,
+                    Id = channelId,
                     Name = StringUtils.ByteArray2String(ci.byChannelName, options.Encoding),
                     IsShowChanName = ci.bIsShowChanName,
                     ChanNameXPos = ci.wChanNameXPos,
