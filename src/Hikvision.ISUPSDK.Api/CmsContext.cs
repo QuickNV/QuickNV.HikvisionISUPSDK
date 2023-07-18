@@ -14,6 +14,7 @@ namespace Hikvision.ISUPSDK.Api
     {
         private CmsContextOptions options;
         private int listenHandle;
+        private DEVICE_REGISTER_CB fnDEVICE_REGISTER_CB;
         private Dictionary<int, DeviceContext> loginIdDeviceDict = new Dictionary<int, DeviceContext>();
         private Dictionary<string, DeviceContext> deviceDict = new Dictionary<string, DeviceContext>();
         public DeviceContext[] Devices { get; private set; } = new DeviceContext[0];
@@ -30,6 +31,7 @@ namespace Hikvision.ISUPSDK.Api
         public CmsContext(CmsContextOptions options)
         {
             this.options = options;
+            fnDEVICE_REGISTER_CB = new DEVICE_REGISTER_CB(onDEVICE_REGISTER_CB);
         }
 
         public static void Init()
@@ -66,7 +68,7 @@ namespace Hikvision.ISUPSDK.Api
             cmd_listen_param.struAddress.Init();
             StringUtils.String2ByteArray(options.ListenIPAddress, cmd_listen_param.struAddress.szIP);
             cmd_listen_param.struAddress.wPort = Convert.ToUInt16(options.ListenPort);
-            cmd_listen_param.fnCB = onDEVICE_REGISTER_CB;
+            cmd_listen_param.fnCB = fnDEVICE_REGISTER_CB;
             cmd_listen_param.byRes = new byte[32];
             listenHandle = Invoke(NET_ECMS_StartListen(ref cmd_listen_param));
         }
