@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Threading.Channels;
 using static Hikvision.ISUPSDK.Defines;
 using static Hikvision.ISUPSDK.Methods;
 
@@ -262,8 +261,6 @@ namespace Hikvision.ISUPSDK.Api
             var struPushStreamOut = NET_EHOME_PUSHSTREAM_OUT.NewInstance();
             //发送请求给设备并开始传输实时码流
             Invoke(NET_ECMS_StartPushRealStream(LoginID, ref struPushStreamIn, ref struPushStreamOut));
-
-
         }
 
         /// <summary>

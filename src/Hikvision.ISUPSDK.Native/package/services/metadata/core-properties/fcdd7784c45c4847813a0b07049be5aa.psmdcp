@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<coreProperties xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.openxmlformats.org/package/2006/metadata/core-properties">
-  <dc:creator>Hikvision</dc:creator>
-  <dc:description>Native binaries(v6.1.9.47) for Hikvision.NetSDK.Include win-x64,win-x86,linux-x64,linux-x86.</dc:description>
-  <dc:identifier>Hikvision.NetSDK.Native</dc:identifier>
-  <version>1.61.947</version>
-  <keywords>Hikvision,NetSDK</keywords>
-  <lastModifiedBy>NuGet.Packaging, Version=6.0.0.280, Culture=neutral, PublicKeyToken=31bf3856ad364e35;</lastModifiedBy>
-</coreProperties>

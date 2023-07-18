@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-  <Relationship Type="http://schemas.microsoft.com/packaging/2010/07/manifest" Target="/Hikvision.NetSDK.Native.nuspec" Id="R5507F3A8D393F0A1" />
-  <Relationship Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="/package/services/metadata/core-properties/fcdd7784c45c4847813a0b07049be5aa.psmdcp" Id="R583C39D743D9BE55" />
-</Relationships>
