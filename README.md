@@ -1,2 +1,2 @@
-# Hikvision.ISUPSDK
-Hikvision ISUPSDK
+# QuickNV.HikvisionISUPSDK
+QuickNV.HikvisionISUPSDK
