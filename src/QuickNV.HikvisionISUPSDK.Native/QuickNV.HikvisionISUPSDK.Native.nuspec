@@ -2,13 +2,13 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
     <id>QuickNV.HikvisionISUPSDK.Native</id>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <authors>Hikvision</authors>
     <owners>Hikvision</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <icon>logo.png</icon>
     <projectUrl>https://github.com/QuickNV/QuickNV.HikvisionISUPSDK</projectUrl>
-    <description>Native Hikvision ISUPSDK binaries(v2.5.0.35).Include win-x64,win-x86,linux-x64,linux-x86.</description>
+    <description>Native Hikvision ISUPSDK binaries(v2.5.0.35).Include win-x64,linux-x64.</description>
     <copyright>Public Domain</copyright>
     <tags>Hikvision,ISUPSDK</tags>
     <dependencies>
