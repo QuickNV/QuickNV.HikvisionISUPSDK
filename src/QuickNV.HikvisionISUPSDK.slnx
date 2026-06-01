@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="QuickNV.HikvisionISUPSDK.Api.Sample/QuickNV.HikvisionISUPSDK.Api.Sample.csproj" />
+  <Project Path="QuickNV.HikvisionISUPSDK.Api/QuickNV.HikvisionISUPSDK.Api.csproj" />
+  <Project Path="QuickNV.HikvisionISUPSDK.Generator/QuickNV.HikvisionISUPSDK.Generator.csproj" />
+  <Project Path="QuickNV.HikvisionISUPSDK.Sample/QuickNV.HikvisionISUPSDK.Sample.csproj" />
+  <Project Path="QuickNV.HikvisionISUPSDK/QuickNV.HikvisionISUPSDK.csproj" />
+</Solution>
